@@ -15,17 +15,20 @@ export default defineConfig({
     sidebar: {
       '/blog/': [
         {
-          text: '博客文章',
+          text: '最新文章',
           items: [
-            { text: '最新文章', link: '/blog/' }
+            { text: 'OpenClaw 好用的 Skill 推荐', link: '/blog/openclaw-skills-recommendation' },
+            { text: 'AI Agent 开发入门指南', link: '/blog/ai-agent-development' },
+            { text: 'RAG 实战：构建智能知识库问答系统', link: '/blog/rag-practical-guide' },
+            { text: '本地 LLM 部署完全指南', link: '/blog/local-llm-deployment' }
           ]
         }
       ],
       '/guide/': [
         {
-          text: '技术教程',
+          text: 'OpenClaw 教程',
           items: [
-            { text: '快速开始', link: '/guide/' }
+            { text: 'OpenClaw 中文安装教程', link: '/guide/openclaw-installation' }
           ]
         }
       ]
