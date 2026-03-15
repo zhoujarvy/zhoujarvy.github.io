@@ -7,26 +7,12 @@ export default defineConfig({
     ['style', { content: `
 :root {
   --vp-c-brand: #00ff41;
-  --vp-c-brand-light: #00ff41;
-  --vp-c-brand-dark: #00ff41;
-  --vp-c-bg: #0d1117;
-  --vp-c-bg-alt: #161b22;
-  --vp-c-bg-soft: #0d1117;
-  --vp-c-text-1: #c9d1d9;
-  --vp-c-text-2: #8b949e;
-  --vp-c-text-3: #6e7681;
-  --vp-c-divider: #30363d;
-  --vp-c-gray-1: #e6edf3;
-  --vp-c-gray-2: #9ca3af;
-  --vp-c-gray-3: #6e7681;
-  --vp-c-gray-soft: #0d1117;
   --code-font: 'JetBrains Mono', 'Fira Code', monospace;
-  --accent-glow: 0 0 20px rgba(0, 255, 65, 0.3);
 }
 
 /* 全局样式 */
 body {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: var(--code-font);
   background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%);
 }
 
@@ -57,31 +43,7 @@ a {
 
 a:hover {
   color: #00ff41;
-  text-shadow: var(--accent-glow);
-}
-
-/* 按钮样式 */
-.VPButton.brand {
-  background: linear-gradient(135deg, #00ff41 0%, #00d4ff 100%);
-  border: none;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-  transition: all 0.3s ease;
-}
-
-.VPButton.brand:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 30px rgba(0, 255, 65, 0.6);
-}
-
-.VPButton.alt {
-  background: transparent;
-  border: 2px solid #00ff41;
-  color: #00ff41;
-}
-
-.VPButton.alt:hover {
-  background: rgba(0, 255, 65, 0.1);
-  box-shadow: var(--accent-glow);
+  text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
 }
 
 /* Hero 区域 */
@@ -135,11 +97,6 @@ a:hover {
 }
 
 /* 内容区域 */
-.VPDoc {
-  background: rgba(13, 17, 23, 0.95);
-  border-left: 1px solid #30363d;
-}
-
 .VPDoc h1,
 .VPDoc h2,
 .VPDoc h3 {
@@ -159,7 +116,6 @@ div[class*='language-']::before {
   color: #00ff41;
   font-size: 0.85em;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
 }
 
 /* 滚动条 */
@@ -179,38 +135,6 @@ div[class*='language-']::before {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #00ff41;
-  box-shadow: var(--accent-glow);
-}
-
-/* 标签样式 */
-.VPBadge {
-  background: linear-gradient(135deg, #00ff41 0%, #00d4ff 100%);
-  color: #0d1117;
-  border: none;
-  font-weight: bold;
-  box-shadow: var(--accent-glow);
-}
-
-/* 表格样式 */
-table {
-  background: rgba(13, 17, 23, 0.8);
-  border: 1px solid #30363d;
-}
-
-table th {
-  background: rgba(0, 255, 65, 0.2);
-  color: #00ff41;
-  border-bottom: 2px solid #00ff41;
-}
-
-table tr:hover {
-  background: rgba(0, 255, 65, 0.05);
-}
-
-/* 页脚 */
-.VPFooter {
-  background: rgba(13, 17, 23, 0.95);
-  border-top: 1px solid #30363d;
 }
     ` }]
   ],
