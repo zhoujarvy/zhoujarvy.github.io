@@ -21,6 +21,7 @@
     "url": "https://github.com/zhoujarvy/zhoujarvy.github.io/issues"
   },
   "homepage": "https://github.com/zhoujarvy/zhoujarvy.github.io#readme",
+  "packageManager": "pnpm@9.0.0",
   "devDependencies": {
     "vitepress": "^1.6.4"
   }
