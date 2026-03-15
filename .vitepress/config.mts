@@ -3,6 +3,9 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Jarvy's Tech Blog",
   description: 'AI 开发技术分享',
+  head: [
+    ['link', { rel: 'stylesheet', href: '/.vitepress/theme/custom.css' }]
+  ],
 
   themeConfig: {
     nav: [
@@ -26,7 +29,17 @@ export default defineConfig({
       ],
       '/guide/': [
         {
-          text: 'OpenClaw 教程',
+          text: 'LangChain 教程',
+          items: [
+            { text: 'LangChain 入门教程', link: '/guide/langchain-01-introduction' },
+            { text: 'LangChain 核心概念详解', link: '/guide/langchain-02-concepts' },
+            { text: 'LangChain 实战：构建问答系统', link: '/guide/langchain-03-qa-system' },
+            { text: 'LangChain 实战：构建文档分析工具', link: '/guide/langchain-04-document-analyzer' },
+            { text: 'LangChain 高级技巧与最佳实践', link: '/guide/langchain-05-best-practices' }
+          ]
+        },
+        {
+          text: '其他教程',
           items: [
             { text: 'OpenClaw 中文安装教程', link: '/guide/openclaw-installation' }
           ]
