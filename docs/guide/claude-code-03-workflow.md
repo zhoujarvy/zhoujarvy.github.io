@@ -311,4 +311,4 @@ cd backend && claude
 4. **代码审查** — 自动化质量检查
 5. **技术迁移** — 分步执行，逐步验证
 
-下一步：[Claude Code 高级配置与技巧](./claude-code-04-advanced)
+下一步：[Claude Code 与其他 AI 工具对比](./claude-code-04-comparison)
