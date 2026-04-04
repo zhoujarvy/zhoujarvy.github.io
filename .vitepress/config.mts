@@ -171,6 +171,26 @@ div[class*='language-']::before {
           ]
         },
         {
+          text: 'Claude Code 教程',
+          items: [
+            { text: 'Claude Code 入门教程', link: '/guide/claude-code-01-introduction' },
+            { text: 'Claude Code 核心功能详解', link: '/guide/claude-code-02-features' },
+            { text: 'Claude Code 实战：自动化开发工作流', link: '/guide/claude-code-03-workflow' },
+            { text: 'Claude Code 高级配置与技巧', link: '/guide/claude-code-04-advanced' },
+            { text: 'Claude Code 与其他 AI 编程工具对比', link: '/guide/claude-code-05-comparison' }
+          ]
+        },
+        {
+          text: 'Claude Code 教程',
+          items: [
+            { text: 'Claude Code 入门教程', link: '/guide/claude-code-01-introduction' },
+            { text: 'Claude Code 核心功能详解', link: '/guide/claude-code-02-features' },
+            { text: 'Claude Code 实战：自动化开发工作流', link: '/guide/claude-code-03-workflow' },
+            { text: 'Claude Code 与其他 AI 工具对比', link: '/guide/claude-code-04-comparison' },
+            { text: 'Claude Code 最佳实践与进阶技巧', link: '/guide/claude-code-05-best-practices' }
+          ]
+        },
+        {
           text: '其他教程',
           items: [
             { text: 'OpenClaw 中文安装教程', link: '/guide/openclaw-installation' }
