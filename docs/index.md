@@ -1,5 +1,6 @@
 ---
 layout: home
+title: Jarvy's Tech Blog - AI 开发技术分享
 
 hero:
   name: "Jarvy's Tech Blog"
