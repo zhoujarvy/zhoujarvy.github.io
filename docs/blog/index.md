@@ -16,9 +16,13 @@
 ### [本地 LLM 部署完全指南](./local-llm-deployment.md)
 详细介绍如何在本地部署大语言模型，包括 Ollama、vLLM 等框架的使用和优化技巧。
 
+### [Hermes Agent 使用教程](./hermes-agent-tutorial.md)
+NousResearch 出品的开源 AI 智能体框架，支持持久化记忆、Skill 自我改进、子 Agent 委派等高级功能。
+
 ## 分类
 
 - [OpenClaw](./openclaw-skills-recommendation.md)
 - [AI 开发](./ai-agent-development.md)
 - [RAG](./rag-practical-guide.md)
 - [LLM 部署](./local-llm-deployment.md)
+- [Hermes Agent](./hermes-agent-tutorial.md)

@@ -155,7 +155,8 @@ div[class*='language-']::before {
             { text: 'OpenClaw 好用的 Skill 推荐', link: '/blog/openclaw-skills-recommendation' },
             { text: 'AI Agent 开发入门指南', link: '/blog/ai-agent-development' },
             { text: 'RAG 实战：构建智能知识库问答系统', link: '/blog/rag-practical-guide' },
-            { text: '本地 LLM 部署完全指南', link: '/blog/local-llm-deployment' }
+            { text: '本地 LLM 部署完全指南', link: '/blog/local-llm-deployment' },
+            { text: 'Hermes Agent 使用教程', link: '/blog/hermes-agent-tutorial' }
           ]
         }
       ],
