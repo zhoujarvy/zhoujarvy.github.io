@@ -13,11 +13,9 @@ export default defineConfig({
     siteTitle: false,
 
     nav: [
-      { text: '首页', link: '/' },
       { text: '博客', link: '/blog/' },
       { text: '教程', link: '/guide/' },
-      { text: '项目', link: '/projects' },
-      { text: '关于', link: '/about' }
+      { text: '项目', link: '/projects' }
     ],
 
     sidebar: {

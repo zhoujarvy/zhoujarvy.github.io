@@ -58,6 +58,17 @@
   text-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
 }
 
+/* ── Push nav menu to the right side ── */
+.VPNavBarMenu {
+  margin-left: auto !important;
+  margin-right: 0.5rem;
+}
+
+/* Nav link active state */
+.VPNavBarMenuLink.active .text {
+  color: var(--neon) !important;
+}
+
 /* Hide the default VitePress title span */
 .VPNavBarTitle a.title > span:not(.custom-site-title) {
   display: none !important;
