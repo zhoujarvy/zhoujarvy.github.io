@@ -1,0 +1,322 @@
+/* ═══════════════════════════════════════════════
+   NEXUS TERMINAL — Cyberpunk Hacker Theme
+   Primary: #00ff41 (Neon Green)
+   Accent:  #00d4ff (Electric Cyan)
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* VitePress brand overrides */
+  --vp-c-brand-1: #00ff41;
+  --vp-c-brand-2: #33ff6a;
+  --vp-c-brand-3: #00cc34;
+  --vp-c-brand-soft: rgba(0, 255, 65, 0.14);
+  --vp-button-brand-bg: #00ff41;
+  --vp-button-brand-text: #06090f;
+  --vp-button-brand-hover-bg: #33ff6a;
+  --vp-button-brand-hover-text: #06090f;
+
+  /* Custom tokens */
+  --neon: #00ff41;
+  --neon-dim: rgba(0, 255, 65, 0.12);
+  --neon-glow: rgba(0, 255, 65, 0.35);
+  --cyan: #00d4ff;
+  --surface-0: #06090f;
+  --surface-1: #0d1117;
+  --surface-2: #151b25;
+  --surface-3: #1c2333;
+  --border: #1b2130;
+  --border-light: #2a3142;
+  --text-primary: #e2e8f0;
+  --text-secondary: #7c8aa0;
+
+  /* VitePress font overrides */
+  --vp-font-family-base: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* VitePress dark bg overrides */
+  --vp-c-bg: #06090f;
+  --vp-c-bg-soft: #0d1117;
+  --vp-c-bg-mute: #151b25;
+  --vp-c-bg-alt: #0d1117;
+  --vp-c-divider: #1b2130;
+  --vp-c-text-1: #e2e8f0;
+  --vp-c-text-2: #7c8aa0;
+  --vp-c-text-3: #4a5568;
+  --vp-c-default-1: #151b25;
+  --vp-c-default-2: #1c2333;
+  --vp-c-default-3: #2a3142;
+  --vp-c-default-soft: rgba(42, 49, 66, 0.5);
+}
+
+/* ── Custom site title in navbar ── */
+.custom-site-title {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em;
+  color: #00ff41 !important;
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.3);
+}
+
+/* Hide the default VitePress title span */
+.VPNavBarTitle a.title > span:not(.custom-site-title) {
+  display: none !important;
+}
+
+/* Hide the VitePress logo */
+.VPNavBarTitle .logo {
+  display: none !important;
+}
+
+/* ── Global Base ── */
+body {
+  font-family: var(--vp-font-family-base) !important;
+  background: var(--surface-0) !important;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Navigation Bar ── */
+.VPNavBar {
+  background: rgba(6, 9, 15, 0.88) !important;
+  backdrop-filter: blur(24px) saturate(150%);
+  border-bottom: 1px solid rgba(0, 255, 65, 0.12) !important;
+}
+
+.VPNavBarMenuLink:hover {
+  color: var(--neon) !important;
+}
+
+.VPNavBarMenuLink .text {
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.VPNavBarMenuLink:hover .text {
+  color: var(--neon) !important;
+  text-shadow: 0 0 10px var(--neon-dim);
+}
+
+/* ── Hero ── */
+.VPHero .name {
+  font-family: var(--vp-font-family-base) !important;
+  background: linear-gradient(135deg, var(--neon) 0%, var(--cyan) 60%, var(--neon) 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: hue-shift 8s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(0, 255, 65, 0.25));
+}
+
+.VPHero .text {
+  color: var(--text-primary) !important;
+  font-family: var(--vp-font-family-base) !important;
+}
+
+.VPHero .tagline {
+  color: var(--text-secondary) !important;
+  font-family: var(--vp-font-family-mono) !important;
+  font-weight: 300 !important;
+  font-size: 1.05rem !important;
+}
+
+/* Hero buttons */
+.VPButton.brand {
+  background: var(--neon) !important;
+  color: var(--surface-0) !important;
+  border: 1px solid var(--neon) !important;
+  font-weight: 600 !important;
+  font-family: var(--vp-font-family-base) !important;
+  transition: all 0.25s ease !important;
+}
+
+.VPButton.brand:hover {
+  background: #33ff6a !important;
+  border-color: #33ff6a !important;
+  box-shadow: 0 0 24px var(--neon-dim), 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.VPButton.alt {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-light) !important;
+  font-family: var(--vp-font-family-base) !important;
+  transition: all 0.25s ease !important;
+}
+
+.VPButton.alt:hover {
+  border-color: var(--neon) !important;
+  color: var(--neon) !important;
+  box-shadow: 0 0 16px var(--neon-dim) !important;
+}
+
+@keyframes hue-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ── Feature Cards ── */
+.VPFeatures {
+  gap: 1.5rem;
+}
+
+.VPFeature {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 1.75rem !important;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.VPFeature::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.VPFeature:hover {
+  border-color: rgba(0, 255, 65, 0.25) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 0 48px var(--neon-dim);
+}
+
+.VPFeature:hover::after {
+  opacity: 1;
+}
+
+.VPFeature h2 {
+  color: var(--neon) !important;
+  font-family: var(--vp-font-family-base) !important;
+  text-shadow: none !important;
+}
+
+.VPFeature p {
+  color: var(--text-secondary) !important;
+}
+
+/* ── Sidebar ── */
+.VPSidebar {
+  background: var(--surface-1) !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+.VPSidebarItem.is-active > .item .link-text,
+.VPSidebarItem.is-active > .item .text {
+  color: var(--neon) !important;
+}
+
+.VPSidebarItem .item:hover .link-text {
+  color: var(--neon) !important;
+}
+
+/* ── Doc Content ── */
+.vp-doc h1, .vp-doc h2, .vp-doc h3, .vp-doc h4 {
+  color: var(--neon) !important;
+  text-shadow: none !important;
+  font-family: var(--vp-font-family-base) !important;
+}
+
+.vp-doc h1 {
+  font-size: 2rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.vp-doc h2 {
+  margin-top: 2.5rem;
+  border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+  padding-bottom: 0.3rem;
+}
+
+.vp-doc p {
+  font-family: var(--vp-font-family-base);
+  line-height: 1.8;
+}
+
+.vp-doc strong {
+  color: var(--neon);
+}
+
+.vp-doc a {
+  color: var(--cyan);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.vp-doc a:hover {
+  color: var(--neon);
+}
+
+/* ── Code Blocks ── */
+div[class*='language-'] {
+  background: var(--surface-0) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+
+div[class*='language-']::before {
+  color: var(--neon) !important;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+:not(pre) > code {
+  font-family: var(--vp-font-family-mono) !important;
+  background: var(--neon-dim) !important;
+  color: var(--neon) !important;
+  border: 1px solid rgba(0, 255, 65, 0.15);
+  border-radius: 4px;
+  padding: 0.12em 0.4em;
+  font-size: 0.88em;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon); }
+
+/* ── Footer ── */
+.VPFooter {
+  background: var(--surface-1) !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+.VPFooter .message,
+.VPFooter .copyright {
+  color: var(--text-secondary) !important;
+}
+
+/* ── Selection ── */
+::selection {
+  background: rgba(0, 255, 65, 0.18);
+  color: var(--neon);
+}
+
+/* ── Links ── */
+a {
+  transition: color 0.2s ease;
+}
+
+.VPSocialLink:hover {
+  color: var(--neon) !important;
+}
+
+/* ── Page Transition ── */
+.VPContent {
+  animation: fade-in 0.35s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}

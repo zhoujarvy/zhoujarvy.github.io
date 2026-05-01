@@ -13,6 +13,9 @@ hero:
     - theme: alt
       text: 技术教程
       link: /guide/
+    - theme: alt
+      text: 我的项目
+      link: /projects
 
 features:
   - title: 🤖 AI 技术
@@ -21,6 +24,8 @@ features:
     details: 分享实际项目开发中的经验、技巧和最佳实践
   - title: 📚 学习笔记
     details: 记录学习过程中的思考和总结，共同进步
+  - title: 🛠️ 开源项目
+    details: 数独游戏、算术练习生成器等在线工具，即开即用
 ---
 
 欢迎来到我的技术博客！这里主要分享 AI 开发相关的技术文章和教程。

@@ -4,146 +4,19 @@ export default defineConfig({
   title: "Jarvy's Tech Blog",
   description: 'AI 开发技术分享',
   head: [
-    ['style', { content: `
-:root {
-  --vp-c-brand: #00ff41;
-  --code-font: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-/* 全局样式 */
-body {
-  font-family: var(--code-font);
-  background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%);
-}
-
-/* 终端风格背景 */
-.VPContent {
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 1px, #0d1117 1px, #0d1117 2px),
-    repeating-linear-gradient(90deg, transparent, transparent 1px, #0d1117 1px, #0d1117 2px);
-  background-size: 20px 20px;
-  background-blend-mode: overlay;
-}
-
-/* 霓虹灯效果 */
-.VPNavBar {
-  background: rgba(13, 17, 23, 0.95);
-  border-bottom: 1px solid #00ff41;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-}
-
-.VPNavBar .container {
-  backdrop-filter: blur(10px);
-}
-
-/* 链接悬停效果 */
-a {
-  transition: all 0.3s ease;
-}
-
-a:hover {
-  color: #00ff41;
-  text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-}
-
-/* Hero 区域 */
-.VPHero {
-  background: linear-gradient(135deg, rgba(0, 255, 65, 0.1) 0%, rgba(13, 17, 23, 0.9) 100%);
-  border: 1px solid #00ff41;
-  box-shadow: 0 0 50px rgba(0, 255, 65, 0.2), inset 0 0 50px rgba(0, 255, 65, 0.1);
-}
-
-.VPHero h1 {
-  text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
-  background: linear-gradient(135deg, #00ff41 0%, #00d4ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* 特性卡片 */
-.VPFeatures {
-  gap: 2rem;
-}
-
-.VPFeature {
-  background: rgba(22, 27, 34, 0.8);
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.VPFeature:hover {
-  border-color: #00ff41;
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
-}
-
-.VPFeature h2 {
-  color: #00ff41;
-  text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-}
-
-/* 侧边栏 */
-.VPSidebar {
-  background: rgba(13, 17, 23, 0.95);
-  border-right: 1px solid #30363d;
-}
-
-.VPSidebarItem a:hover {
-  color: #00ff41;
-  background: rgba(0, 255, 65, 0.1);
-}
-
-/* 内容区域 */
-.VPDoc h1,
-.VPDoc h2,
-.VPDoc h3 {
-  color: #00ff41;
-  text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-}
-
-/* 代码块 */
-div[class*='language-'] {
-  background: #0d1117 !important;
-  border: 1px solid #30363d;
-  border-radius: 4px;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-}
-
-div[class*='language-']::before {
-  color: #00ff41;
-  font-size: 0.85em;
-  font-weight: bold;
-}
-
-/* 滚动条 */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0d1117;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #30363d;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #00ff41;
-}
-    ` }]
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', { href: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap', rel: 'stylesheet' }]
   ],
 
   themeConfig: {
+    siteTitle: false,
+
     nav: [
       { text: '首页', link: '/' },
       { text: '博客', link: '/blog/' },
       { text: '教程', link: '/guide/' },
+      { text: '项目', link: '/projects' },
       { text: '关于', link: '/about' }
     ],
 
@@ -195,20 +68,12 @@ div[class*='language-']::before {
       { icon: 'github', link: 'https://github.com/zhoujarvy' }
     ],
 
-    // 极客风格 - 暗色主题
-    darkMode: 'dark',
-
-    // 中文语言
-    lang: 'zh-CN',
-
     footer: {
       message: 'Released under MIT License.',
       copyright: 'Copyright © 2026-present Jarvy'
     }
   },
 
-  // 默认使用暗色主题
-  appearance: 'dark',
-
+  appearance: 'force-dark',
   lang: 'zh-CN'
 })
