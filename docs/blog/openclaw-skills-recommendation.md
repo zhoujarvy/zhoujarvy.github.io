@@ -1,6 +1,7 @@
 ---
 title: OpenClaw 好用的 Skill 推荐
 date: 2026-03-15
+updated: 2026-05-06
 tags: [OpenClaw, Skills, 推荐]
 category: 教程
 ---
@@ -15,7 +16,7 @@ Skills 是 OpenClaw 的功能扩展包，类似于插件。每个 Skill 是一�
 
 ## 如何安装 Skills？
 
-使用 [ClawHub](https://clawhub.com) CLI：
+使用 [ClawHub](https://clawhub.ai) CLI：
 
 ```bash
 # 安装 CLI
@@ -127,7 +128,7 @@ clawhub install healthcheck
 **功能：** 使用 ClawHub CLI 搜索、安装、更新和发布 Skills
 
 **适用场景：**
-- 从 clawhub.com 获取新 Skills
+- 从 clawhub.ai 获取新 Skills
 - 同步已安装 Skills 到最新版本
 - 发布新的/更新的 Skill 文件夹
 
@@ -172,7 +173,7 @@ clawhub publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0
 1. **批量更新：** 定期运行 `clawhub update --all` 保持 Skills 最新
 2. **搜索技巧：** 使用自然语言搜索，如 "backup postgres database"
 3. **备份 Skills：** 使用 `clawhub sync` 备份你的自定义 Skills
-4. **查看 Skill 详情：** 在 [clawhub.com](https://clawhub.com) 浏览所有可用 Skills
+4. **查看 Skill 详情：** 在 [clawhub.ai](https://clawhub.ai) 浏览所有可用 Skills
 
 ## 总结
 
