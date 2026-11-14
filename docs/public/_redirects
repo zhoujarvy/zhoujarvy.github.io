@@ -1,4 +1,14 @@
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Cloudflare Pages 重定向规则
+# 格式：每行一条 `source destination code`，以 # 开头的行为注释。
+#
+# 这里刻意不配置任何规则。VitePress 是静态多页站点，每个路由都有对应的
+# .html 产物；Cloudflare Pages 会自动匹配无扩展名路径，并为目录请求提供
+# index.html，因此不需要 SPA fallback。
+#
+# 请勿添加「/* 通配指向 /index.html 的 200 重写」这类规则：
+# Cloudflare Pages 的重定向无论请求路径是否存在对应静态资源都会执行，
+# 会把 /assets/* 以及 /zhaoxiongxiong/ 这类独立静态页面一并重写成首页，
+# 导致整站资源与页面不可用。
+#
+# 找熊熊游戏页由 /zhaoxiongxiong/index.html 直接提供，访问路径为
+# /zhaoxiongxiong/ ，无需任何重定向。
