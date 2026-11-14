@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>找熊熊 · 十小关闯关 | Jarvy's Tech Blog</title>
+<meta name="description" content="每一行、每一列、每一个色块区域都要有且仅有一只熊熊；每大关 10 个小关，全部完成才解锁下一关。">
+<style>
+:root{
+  --bg:#f7f4ee;
+  --card:#fffdf9;
+  --ink:#3b322a;
+  --muted:#8b7f72;
+  --line:#e9e1d5;
+  --accent:#a9713f;
+  --danger:#d8493f;
+  --danger-soft:#fdecea;
+  --ok:#2f8a5b;
+  --ok-soft:#e7f4ec;
+  --info:#3d6fa8;
+  --info-soft:#e9f1fb;
+  --region-line:#6d5b4b;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.app{max-width:620px;margin:0 auto;padding:22px 16px 44px}
+header{text-align:center;margin-bottom:14px}
+h1{margin:0;font-size:clamp(27px,6.2vw,38px);letter-spacing:3px;font-weight:800}
+h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
+.sub{margin:6px 0 14px;color:var(--muted);font-size:12.5px;line-height:1.7}
+.level-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:10px 12px;text-align:left
+}
+.level-bar .lv-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.level-bar .lv-title{font-size:15px;font-weight:800;color:var(--accent)}
+.level-bar .lv-best{font-size:11.5px;color:var(--muted)}
+.level-bar .btn{flex:0 0 auto}
+.sub-progress{display:flex;gap:5px;margin:10px 0 0}
+.sub-dot{
+  flex:1;min-width:0;height:22px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+  transition:background .2s,color .2s,border-color .2s,transform .2s
+}
+.sub-dot.done{background:var(--ok-soft);border-color:#bfdfc9;color:var(--ok)}
+.sub-dot.current{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(169,113,63,.3);transform:translateY(-1px)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 4px;text-align:center}
+.stat .k{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.stat .v{display:block;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--danger)}
+.stat .v.good{color:var(--ok)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:12px}
+.segmented{display:inline-flex;background:#efe9df;border-radius:999px;padding:4px;gap:3px}
+.segmented button{
+  border:0;background:transparent;color:var(--muted);font-size:13px;font-weight:600;
+  padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;white-space:nowrap;
+  min-height:38px;transition:background .15s,color .15s,box-shadow .15s
+}
+.segmented button.active{background:var(--card);color:var(--accent);box-shadow:0 2px 6px rgba(90,70,50,.14)}
+.btn{
+  border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:11px;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;
+  font-family:inherit;min-height:40px;white-space:nowrap;
+  transition:transform .12s,box-shadow .12s,border-color .12s,background .12s
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(90,70,50,.12);border-color:#d8c8b3}
+.btn:active{transform:translateY(0)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--danger);border-color:#f0cdc9}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.feedback{
+  display:flex;align-items:flex-start;gap:9px;min-height:46px;
+  border-radius:13px;padding:11px 14px;margin-bottom:12px;
+  font-size:13px;line-height:1.6;font-weight:600;
+  background:var(--card);border:1px solid var(--line);color:var(--muted);
+  transition:background .18s,color .18s,border-color .18s
+}
+.feedback .ico{flex:0 0 auto;font-size:15px;line-height:1.4}
+.feedback.warn{background:var(--danger-soft);border-color:#f3c5c0;color:#a4312b}
+.feedback.info{background:var(--info-soft);border-color:#cfdff2;color:#2b5687}
+.feedback.success{background:var(--ok-soft);border-color:#bfdfc9;color:#1f6b43}
+.board-shell{position:relative}
+.board{
+  display:grid;width:100%;aspect-ratio:1/1;gap:0;overflow:hidden;
+  border-radius:16px;background:#fff;--n:5;
+  box-shadow:0 12px 30px rgba(90,70,50,.16),0 2px 6px rgba(90,70,50,.08);
+  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+  touch-action:manipulation
+}
+.board.is-swiping{box-shadow:0 0 0 4px rgba(169,113,63,.45),0 12px 30px rgba(90,70,50,.18)}
+.cell{
+  appearance:none;-webkit-appearance:none;margin:0;padding:0;border-style:solid;
+  display:flex;align-items:center;justify-content:center;position:relative;
+  background-clip:padding-box;cursor:pointer;font-family:inherit;
+  -webkit-touch-callout:none;transition:filter .12s
+}
+.cell:hover{filter:brightness(1.07)}
+.cell:focus-visible{outline:3px solid var(--accent);outline-offset:-3px;z-index:3}
+.cell.in-conflict-region{box-shadow:inset 0 0 0 2px rgba(216,73,63,.3)}
+.cell.is-conflict{
+  background-image:linear-gradient(rgba(216,73,63,.17),rgba(216,73,63,.17));
+  box-shadow:inset 0 0 0 3px var(--danger);z-index:2
+}
+.bear{
+  position:relative;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  width:78%;height:78%;border-radius:50%;line-height:1;
+  background:radial-gradient(circle at 34% 28%,#fffaf1,#eccfa8);
+  box-shadow:0 2px 7px rgba(90,60,30,.3),inset 0 0 0 2px rgba(255,255,255,.75);
+  font-size:clamp(10px,calc(min(86vw,588px) / var(--n) * 0.5),30px);
+  animation:pop .28s cubic-bezier(.2,1.5,.4,1) both
+}
+.cross{
+  color:#9c8e7e;font-weight:700;opacity:.8;
+  font-size:clamp(10px,calc(min(86vw,588px) / var(--n) * 0.46),27px);
+  animation:fade .18s ease-out both
+}
+@keyframes pop{from{transform:scale(.25);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:.8}}
+@keyframes cheer{0%{transform:scale(1)}45%{transform:scale(1.18) rotate(-7deg)}100%{transform:scale(1)}}
+.cell.is-win .bear{animation:cheer .55s ease-in-out both}
+.loading{
+  position:absolute;inset:0;border-radius:16px;background:rgba(255,253,249,.93);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;
+  font-size:14px;color:var(--accent);font-weight:600;z-index:5
+}
+.loading .spin{font-size:34px;animation:rotate 1.4s linear infinite}
+@keyframes rotate{to{transform:rotate(360deg)}}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin:14px 0 4px;font-size:11.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
+.legend i.bear-dot{background:#eccfa8;border-radius:50%}
+.legend i.cross-dot{background:#fff;color:#9c8e7e;font-style:normal;text-align:center;line-height:12px}
+.legend i.conflict-dot{background:var(--danger-soft);border:2px solid var(--danger)}
+.legend .tip{width:100%;text-align:center;color:var(--accent);font-weight:600}
+details.rules{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:12.5px;color:var(--muted);line-height:1.9}
+details.rules summary{cursor:pointer;font-weight:700;color:var(--ink);font-size:14px}
+details.rules ol{margin:10px 0 2px;padding-left:20px}
+details.rules b{color:var(--accent)}
+.modal{position:fixed;inset:0;z-index:20;background:rgba(59,50,42,.46);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}
+.modal-card{background:var(--card);border-radius:22px;padding:26px 22px;text-align:center;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.22);animation:rise .32s cubic-bezier(.2,1.3,.4,1) both;max-height:86vh;overflow:auto}
+.modal-card.wide{max-width:460px}
+@keyframes rise{from{transform:translateY(18px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.modal-emoji{font-size:42px;line-height:1.2}
+.modal-card h2{margin:6px 0 8px;font-size:21px}
+.modal-card p{margin:0 0 18px;color:var(--muted);font-size:13.5px;line-height:1.8;white-space:pre-line}
+.modal-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:14px 0}
+.level-card{
+  display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;
+  border:1px solid var(--line);background:var(--card);border-radius:12px;
+  padding:9px 10px;cursor:pointer;font-family:inherit;min-height:94px
+}
+.level-card:hover:not(:disabled){border-color:var(--accent);transform:translateY(-1px)}
+.level-card.current{border-color:var(--accent);box-shadow:0 0 0 2px rgba(169,113,63,.2)}
+.level-card.cleared{background:var(--ok-soft);border-color:#bfdfc9}
+.level-card.locked{opacity:.55;background:#f4f0e9}
+.level-card .lv-no{font-size:16px;font-weight:800;color:var(--accent)}
+.level-card.cleared .lv-no{color:var(--ok)}
+.level-card .lv-name{font-size:12.5px;font-weight:700}
+.level-card .lv-size{font-size:11px;color:var(--muted)}
+.level-card .lv-rec{font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:2px}
+.lv-bar{display:block;width:100%;height:5px;border-radius:99px;background:#ece5da;overflow:hidden;margin-top:5px}
+.lv-bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.sub-rec{margin:6px 0 4px;background:#faf6ef;border:1px solid var(--line);border-radius:12px;padding:8px 12px;text-align:left}
+.sub-rec summary{cursor:pointer;font-size:12.5px;font-weight:700;color:var(--accent)}
+.sub-rec-list{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 12px;margin-top:8px;font-size:11px;color:var(--muted);line-height:1.6}
+.sub-rec-list span b{color:var(--ink)}
+.note{font-size:11px;color:var(--muted);line-height:1.6;margin:10px 0 14px}
+.modal-foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.back-link{text-align:center;margin:18px 0 0;font-size:12.5px}
+.back-link a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
+.back-link a:hover{border-bottom-color:var(--accent)}
+@media (max-width:420px){
+  .app{padding:16px 10px 30px}
+  .stat .v{font-size:15px}
+  .btn{padding:8px 10px;font-size:12.5px}
+  .segmented button{padding:7px 11px;font-size:12.5px}
+  .level-grid{grid-template-columns:repeat(3,1fr)}
+  .sub-progress{gap:3px}
+  .sub-dot{font-size:10px;height:20px;border-radius:6px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1><span class="logo">🐻</span>找熊熊</h1>
+    <p class="sub">每一行 · 每一列 · 每一个色块区域，都要有且仅有一只熊熊</p>
+    <div class="level-bar">
+      <div class="lv-main">
+        <span class="lv-title" id="levelTitle">第 1 关 · 第 1 / 10 小关 · 5 × 5</span>
+        <span class="lv-best" id="levelBest">尚无成绩</span>
+      </div>
+      <button type="button" class="btn" id="levelBtn">关卡列表</button>
+    </div>
+    <div class="sub-progress" id="subProgress" aria-label="本关 10 个小关进度"></div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><span class="k">用时</span><span class="v" id="timeVal">00:00</span></div>
+    <div class="stat"><span class="k">步数</span><span class="v" id="stepVal">0</span></div>
+    <div class="stat"><span class="k">已放熊熊</span><span class="v" id="placedVal">0 / 5</span></div>
+    <div class="stat"><span class="k">冲突</span><span class="v" id="conflictVal">0</span></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="segmented" id="modePicker" aria-label="选择标记类型">
+      <button type="button" data-mode="bear" class="active">🐻 放熊熊</button>
+      <button type="button" data-mode="cross">✕ 打叉</button>
+    </div>
+    <button type="button" class="btn" id="undoBtn">撤销</button>
+    <button type="button" class="btn" id="hintBtn">提示一只</button>
+    <button type="button" class="btn" id="checkBtn">检查局面</button>
+    <button type="button" class="btn" id="restartBtn">重新开始</button>
+    <button type="button" class="btn" id="shuffleBtn">换一盘</button>
+  </div>
+
+  <div class="feedback" id="feedback" role="status" aria-live="polite">
+    <span class="ico" id="feedbackIcon">🐾</span>
+    <span id="feedbackText">正在准备棋盘…</span>
+  </div>
+
+  <div class="board-shell">
+    <div class="board" id="board" role="group" aria-label="找熊熊棋盘"></div>
+    <div class="loading" id="loading" hidden><span class="spin">🐻</span><span id="loadingText">正在随机生成一块新的色块棋盘…</span></div>
+  </div>
+
+  <div class="legend">
+    <span><i class="bear-dot"></i>熊熊标记</span>
+    <span><i class="cross-dot">✕</i>排除笔记</span>
+    <span><i class="conflict-dot"></i>冲突位置</span>
+    <span><i style="background:hsl(280,56%,86%)"></i>彩色块 = 一个区域</span>
+    <span class="tip">手机操作：长按格子并滑动可整行快速打叉，从已有叉上起手则是整行擦除</span>
+  </div>
+
+  <details class="rules">
+    <summary>玩法与闯关说明</summary>
+    <ol>
+      <li>棋盘被分成若干块<b>彩色区域</b>，每个区域、每一行、每一列都<b>有且仅有一只熊熊</b>。</li>
+      <li>点击放熊熊，再点一次取消；右键或切换「打叉」做排除笔记，笔记不参与判定。手机上<b>长按并滑动</b>可连续打叉或擦除。</li>
+      <li>同一行、列或色块出现两只熊熊时会标红并给出具体冲突提示，冲突涉及的色块也会整体描边。</li>
+      <li>每一大关含 <b>10 个小关</b>，<b>全部 10 个小关完成才解锁下一大关</b>；每过一大关棋盘增加一行一列。已解锁的大关可反复重玩。</li>
+      <li><b>每小关棋盘都随机生成，没有固定布局</b>：下一小关、重玩、点「换一盘」都会得到全新棋盘；只有中途退出后回来会恢复原来那盘。</li>
+      <li>每个小关与整个大关的<b>最佳用时、最少步数、通关次数</b>，以及未完成的局面都保存在本机浏览器；切到后台时计时自动暂停。</li>
+      <li>桌面快捷键：<b>Z</b> 撤销、<b>X</b> 切换标记模式、<b>Esc</b> 关闭弹窗。</li>
+    </ol>
+  </details>
+  <p class="back-link"><a href="/projects.html">← 返回「我的项目」</a></p>
+</div>
+
+<div class="modal" id="winModal" hidden>
+  <div class="modal-card">
+    <div class="modal-emoji" id="winEmoji">🐻🎉</div>
+    <h2 id="winTitle">通关啦！</h2>
+    <p id="winText"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn primary" id="winNext">下一小关</button>
+      <button type="button" class="btn" id="winReplay">从头挑战本关</button>
+      <button type="button" class="btn" id="winLevels">关卡列表</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="levelModal" hidden>
+  <div class="modal-card wide">
+    <div class="modal-emoji">🗺️</div>
+    <h2>关卡地图</h2>
+    <p>每关含 10 个小关，全部完成才解锁下一关；每过一关棋盘增加一行一列。每个小关棋盘都随机生成，重玩也是全新棋盘。</p>
+    <div class="level-grid" id="levelGrid"></div>
+    <details class="sub-rec" id="subRecWrap">
+      <summary>第 <span id="subRecLevel">1</span> 关 · 各小关成绩</summary>
+      <div class="sub-rec-list" id="subRecList"></div>
+    </details>
+    <div class="note" id="storageNote"></div>
+    <div class="modal-foot">
+      <button type="button" class="btn" id="closeLevels">返回棋盘</button>
+      <button type="button" class="btn" id="resetLevelBtn">从头挑战本关</button>
+      <button type="button" class="btn danger" id="clearBtn">清空本地成绩</button>
+    </div>
+  </div>
+</div>
+
+<script id="logic">
+/* 纯规则与棋盘逻辑：不依赖页面元素，便于独立校验 */
+var BearLogic = (function(){
+  'use strict';
+
+  /* 每次生成都使用真随机源，不存在固定布局 */
+  function range(n){var a=[];for(var i=0;i<n;i++)a.push(i);return a;}
+  function shuffle(a){
+    for(var i=a.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;
+    }
+    return a;
+  }
+  function neighbors(idx,n){
+    var r=Math.floor(idx/n),c=idx%n,out=[];
+    var d=[[-1,0],[1,0],[0,-1],[0,1]];
+    for(var k=0;k<4;k++){
+      var nr=r+d[k][0],nc=c+d[k][1];
+      if(nr>=0&&nr<n&&nc>=0&&nc<n)out.push(nr*n+nc);
+    }
+    return out;
+  }
+  function connected(region,n,rid){
+    var cells=[];
+    for(var i=0;i<n*n;i++)if(region[i]===rid)cells.push(i);
+    if(!cells.length)return false;
+    var set={},q=[cells[0]],seen={};seen[cells[0]]=1;
+    for(var i=0;i<cells.length;i++)set[cells[i]]=1;
+    while(q.length){
+      var x=q.pop(),nb=neighbors(x,n);
+      for(var j=0;j<nb.length;j++){
+        var y=nb[j];
+        if(set[y]&&!seen[y]){seen[y]=1;q.push(y);}
+      }
+    }
+    var count=0;for(var k in seen)count++;
+    return count===cells.length;
+  }
+
+  /* 以每只熊熊所在格为种子，生长出 n 个连通色块，每块恰含一个种子 */
+  function growRegions(n,perm){
+    var region=new Array(n*n).fill(-1),size=new Array(n).fill(1);
+    for(var r=0;r<n;r++)region[r*n+perm[r]]=r;
+    var left=n*n-n,maxSize=Math.ceil(n*1.8);
+    function collect(cap){
+      var pairs=[];
+      for(var idx=0;idx<n*n;idx++){
+        if(region[idx]!==-1)continue;
+        var nb=neighbors(idx,n),cand={};
+        for(var j=0;j<nb.length;j++){
+          var rid=region[nb[j]];
+          if(rid!==-1)cand[rid]=1;
+        }
+        for(var key in cand){
+          var rid=Number(key);
+          if(cap&&size[rid]>=maxSize)continue;
+          pairs.push([idx,rid]);
+        }
+      }
+      return pairs;
+    }
+    while(left>0){
+      var pairs=collect(true);
+      if(!pairs.length)pairs=collect(false);
+      if(!pairs.length)return null;
+      var p=pairs[Math.floor(Math.random()*pairs.length)];
+      region[p[0]]=p[1];size[p[1]]++;left--;
+    }
+    return region;
+  }
+
+  /* 回溯求解，最多找 limit 个解 */
+  function countSolutions(n,region,limit){
+    var count=0;
+    var usedCol=new Array(n).fill(false),usedReg=new Array(n).fill(false);
+    function dfs(r){
+      if(count>=limit)return;
+      if(r===n){count++;return;}
+      for(var c=0;c<n;c++){
+        if(usedCol[c])continue;
+        var rid=region[r*n+c];
+        if(usedReg[rid])continue;
+        usedCol[c]=true;usedReg[rid]=true;
+        dfs(r+1);
+        usedCol[c]=false;usedReg[rid]=false;
+        if(count>=limit)return;
+      }
+    }
+    dfs(0);
+    return count;
+  }
+
+  /* 完整搜索树规模：解越少树越小，用作分区优化评分；带上限防止大棋盘卡住 */
+  function treeScore(n,region){
+    var nodes=0,cap=120000;
+    var usedCol=new Array(n).fill(false),usedReg=new Array(n).fill(false);
+    function dfs(r){
+      for(var c=0;c<n;c++){
+        if(nodes>cap)return;
+        nodes++;
+        if(usedCol[c])continue;
+        var rid=region[r*n+c];
+        if(usedReg[rid])continue;
+        if(r<n-1){
+          usedCol[c]=true;usedReg[rid]=true;
+          dfs(r+1);
+          usedCol[c]=false;usedReg[rid]=false;
+        }
+      }
+    }
+    dfs(0);
+    return nodes;
+  }
+
+  /* 在非种子格之间微调边界，保持区域连通，同时收紧可行解数量 */
+  function tighten(n,region,seeds,iters){
+    var best=treeScore(n,region),size=new Array(n).fill(0);
+    for(var i=0;i<n*n;i++)size[region[i]]++;
+    var maxSize=Math.ceil(n*1.8);
+    for(var it=0;it<iters;it++){
+      var idx=Math.floor(Math.random()*n*n);
+      if(seeds[idx])continue;
+      var a=region[idx],nb=neighbors(idx,n),cands=[],seen={};
+      for(var j=0;j<nb.length;j++){
+        var b=region[nb[j]];
+        if(b!==a&&!seen[b]){seen[b]=1;cands.push(b);}
+      }
+      if(!cands.length)continue;
+      var pick=cands[Math.floor(Math.random()*cands.length)];
+      if(size[pick]>=maxSize)continue;
+      region[idx]=pick;
+      if(!connected(region,n,a)){region[idx]=a;continue;}
+      var s=treeScore(n,region);
+      if(s<=best){best=s;size[a]--;size[pick]++;}
+      else region[idx]=a;
+    }
+  }
+
+  /* 规则求值：每次操作后都全量重算，保证界面状态与规则始终一致 */
+  function evaluate(n,region,cells){
+    var rowCount=new Array(n).fill(0),colCount=new Array(n).fill(0),regCount=new Array(n).fill(0);
+    var bears=[];
+    for(var i=0;i<n*n;i++){
+      if(cells[i]!==1)continue;
+      bears.push(i);
+      var r=Math.floor(i/n),c=i%n;
+      rowCount[r]++;colCount[c]++;regCount[region[i]]++;
+    }
+    var issues=[],conflicts=new Set();
+    function collect(type,counts){
+      for(var k=0;k<n;k++){
+        if(counts[k]<=1)continue;
+        issues.push({type:type,index:k,count:counts[k]});
+        for(var j=0;j<bears.length;j++){
+          var idx=bears[j],r=Math.floor(idx/n),c=idx%n;
+          if((type==='row'&&r===k)||(type==='col'&&c===k)||(type==='region'&&region[idx]===k))conflicts.add(idx);
+        }
+      }
+    }
+    collect('row',rowCount);collect('col',colCount);collect('region',regCount);
+    var solved=true;
+    for(var k=0;k<n;k++){
+      if(rowCount[k]!==1||colCount[k]!==1||regCount[k]!==1){solved=false;break;}
+    }
+    return {
+      rowCount:rowCount,colCount:colCount,regCount:regCount,
+      issues:issues,conflicts:conflicts,placed:bears.length,solved:solved
+    };
+  }
+
+  /* 从当前局面出发找兼容的完成方案，供提示与检查使用。
+     采用「候选最少优先」的行选择 + 优先尝试已知解，避免大棋盘上回溯爆炸 */
+  function findSolution(n,region,cells,prefer){
+    var fixed=new Array(n).fill(-1);
+    for(var r=0;r<n;r++){
+      var cnt=0,col=-1;
+      for(var c=0;c<n;c++)if(cells[r*n+c]===1){cnt++;col=c;}
+      if(cnt>1)return null;
+      fixed[r]=col;
+    }
+    var usedCol=new Array(n).fill(false),usedReg=new Array(n).fill(false);
+    var out=new Array(n).fill(-1),done=new Array(n).fill(false);
+    function dfs(depth){
+      if(depth===n)return true;
+      var row=-1,opts=null,fewest=Infinity;
+      for(var r=0;r<n;r++){
+        if(done[r])continue;
+        var lo=fixed[r]>=0?fixed[r]:0,hi=fixed[r]>=0?fixed[r]:n-1,list=[];
+        for(var c=lo;c<=hi;c++){
+          if(usedCol[c])continue;
+          var rid=region[r*n+c];
+          if(usedReg[rid])continue;
+          list.push(c);
+        }
+        if(list.length<fewest){fewest=list.length;row=r;opts=list;if(!list.length)break;}
+      }
+      if(row<0||!opts.length)return false;
+      if(opts.length>1){
+        shuffle(opts);
+        if(prefer){
+          var pc=prefer[row];
+          for(var q=0;q<opts.length;q++){
+            if(opts[q]===pc){var t=opts[0];opts[0]=opts[q];opts[q]=t;break;}
+          }
+        }
+      }
+      for(var q=0;q<opts.length;q++){
+        var c=opts[q],rid2=region[row*n+c];
+        usedCol[c]=true;usedReg[rid2]=true;out[row]=c;done[row]=true;
+        if(dfs(depth+1))return true;
+        usedCol[c]=false;usedReg[rid2]=false;done[row]=false;
+      }
+      return false;
+    }
+    return dfs(0)?out.slice():null;
+  }
+
+  /* 棋盘自检：色块连通、参考布局满足三条规则、至少存在一个可行解 */
+  function verify(n,region,perm){
+    var errors=[],seen={};
+    for(var r=0;r<n;r++){
+      if(!(perm[r]>=0&&perm[r]<n)||seen[perm[r]])errors.push('参考布局的行列不合法');
+      seen[perm[r]]=1;
+    }
+    var size=new Array(n).fill(0),seedCount=new Array(n).fill(0);
+    for(var r=0;r<n;r++)seedCount[region[r*n+perm[r]]]++;
+    for(var i=0;i<n*n;i++){
+      var rid=region[i];
+      if(!(rid>=0&&rid<n))errors.push('存在未分配色块的格子');else size[rid]++;
+    }
+    for(var k=0;k<n;k++){
+      if(size[k]===0)errors.push('存在空的色块区域');
+      if(seedCount[k]!==1)errors.push('色块区域的熊熊数不等于一');
+      if(!connected(region,n,k))errors.push('色块区域不连通');
+    }
+    /* 参考布局满足三条规则本身就证明至少存在一个可行解，无需再回溯计数 */
+    var cells=new Array(n*n).fill(0);
+    for(var r=0;r<n;r++)cells[r*n+perm[r]]=1;
+    if(!evaluate(n,region,cells).solved)errors.push('参考布局未满足三条规则');
+    return {ok:errors.length===0,errors:errors};
+  }
+
+  function fallback(n){
+    var region=new Array(n*n),perm=shuffle(range(n));
+    for(var r=0;r<n;r++)for(var c=0;c<n;c++)region[r*n+c]=r;
+    return {n:n,region:region,perm:perm,sols:countSolutions(n,region,2)};
+  }
+
+  /* 真随机生成：每次调用都是全新布局。
+     小棋盘在时间预算内收紧到唯一解；大棋盘跳过无效的优化，取首个合法棋盘，保证流畅 */
+  function generate(n,budgetMs){
+    var hard=n<9;
+    var deadline=Date.now()+(budgetMs||(hard?600:400));
+    var rounds=hard?(n>=7?3:4):0;
+    var best=null,bestSols=Infinity;
+    for(var attempt=0;attempt<10;attempt++){
+      var perm=shuffle(range(n));
+      var region=growRegions(n,perm);
+      if(!region)continue;
+      var seeds={};
+      for(var r=0;r<n;r++)seeds[r*n+perm[r]]=1;
+      var sols=countSolutions(n,region,2);
+      for(var k=0;k<rounds&&sols>1;k++){
+        tighten(n,region,seeds,140);
+        sols=countSolutions(n,region,2);
+      }
+      if(!verify(n,region,perm).ok)continue;
+      if(sols<bestSols){
+        bestSols=sols;
+        best={n:n,region:region,perm:perm,sols:sols};
+      }
+      if(sols===1)break;
+      /* 大棋盘的搜索树规模太大，收紧优化收益极低，直接采用首个合法棋盘 */
+      if(!hard||Date.now()>=deadline)break;
+    }
+    return best||fallback(n);
+  }
+
+  return {generate:generate,verify:verify,evaluate:evaluate,findSolution:findSolution,countSolutions:countSolutions};
+})();
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var SAVE_KEY='zhaoxiongxiong.save.v3';
+  var SUBS=10;
+  var HUE_NAMES=['珊瑚红','蜜桃粉','杏子橙','暖沙黄','柠檬黄','嫩芽黄绿','嫩芽绿','薄荷绿','湖水青','天青蓝','晴空蓝','靛青蓝','薰衣草紫','紫罗兰','玫瑰紫','玫红粉'];
+  function el(id){return document.getElementById(id);}
+  var boardEl=el('board'),cellEls=[];
+  var G=null,save=null,storageOK=true,progressTimer=null,suppressClick=false;
+  var gesture={active:false,swiping:false,timer:null,startIdx:-1,x:0,y:0,state:2,visited:{},changed:0};
+  var confirmClear=false,clearTimer=null;
+
+  function sizeForLevel(level){return level+4;}
+  function fmtTime(s){
+    s=Math.max(0,Math.floor(s));
+    var m=Math.floor(s/60),r=s%60;
+    return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;
+  }
+  function vibrate(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
+  function defaultSave(){return {v:3,unlocked:1,records:{},progress:{}};}
+  function loadSave(){
+    try{
+      var raw=localStorage.getItem(SAVE_KEY);
+      if(!raw)return defaultSave();
+      var d=JSON.parse(raw);
+      if(!d||typeof d!=='object')return defaultSave();
+      return {
+        v:3,
+        unlocked:Math.max(1,Math.min(999,Number(d.unlocked)||1)),
+        records:(d.records&&typeof d.records==='object')?d.records:{},
+        progress:(d.progress&&typeof d.progress==='object')?d.progress:{}
+      };
+    }catch(e){storageOK=false;return defaultSave();}
+  }
+  function persist(){
+    if(!storageOK)return;
+    try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}
+    catch(e){storageOK=false;}
+  }
+  function validBoard(b,n){
+    if(!b||b.n!==n||!Array.isArray(b.region)||b.region.length!==n*n||!Array.isArray(b.perm)||b.perm.length!==n)return false;
+    for(var i=0;i<n*n;i++)if(!(b.region[i]>=0&&b.region[i]<n))return false;
+    for(var r=0;r<n;r++)if(!(b.perm[r]>=0&&b.perm[r]<n))return false;
+    return BearLogic.verify(n,b.region,b.perm).ok;
+  }
+  function normalizeProgress(pr,n){
+    if(!pr||typeof pr!=='object')return null;
+    var out={
+      sub:Math.max(1,Math.min(SUBS,Number(pr.sub)||1)),
+      runSteps:Math.max(0,Number(pr.runSteps)||0),
+      runTime:Math.max(0,Number(pr.runTime)||0),
+      board:null,cells:null,steps:0,elapsed:0
+    };
+    if(validBoard(pr.board,n)){
+      out.board=pr.board;
+      if(Array.isArray(pr.cells)&&pr.cells.length===n*n){
+        out.cells=pr.cells.slice().map(function(x){return (x===1||x===2)?x:0;});
+        out.steps=Math.max(0,Number(pr.steps)||0);
+        out.elapsed=Math.max(0,Number(pr.elapsed)||0);
+      }
+    }
+    return out;
+  }
+  function saveProgress(){
+    if(!G||G.won)return;
+    var L=G.level,S=G.sub,cells=G.cells.slice(),steps=G.steps,elapsed=G.elapsed;
+    var board={n:G.n,region:G.region.slice(),perm:G.perm.slice()};
+    var runSteps=G.runSteps,runTime=G.runTime;
+    clearTimeout(progressTimer);
+    progressTimer=setTimeout(function(){
+      if(!G||G.level!==L||G.sub!==S||G.won)return;
+      save.progress[L]={sub:S,runSteps:runSteps,runTime:runTime,board:board,cells:cells,steps:steps,elapsed:elapsed};
+      persist();
+    },220);
+  }
+  /* 切到后台或关闭页面时立即落盘，避免计时与局面丢失 */
+  function flushProgress(){
+    if(!G||G.won)return;
+    clearTimeout(progressTimer);
+    save.progress[G.level]={
+      sub:G.sub,runSteps:G.runSteps,runTime:G.runTime,
+      board:{n:G.n,region:G.region.slice(),perm:G.perm.slice()},
+      cells:G.cells.slice(),steps:G.steps,elapsed:G.elapsed
+    };
+    persist();
+  }
+
+  /* 动态色板：任意阶数都有 n 种色相均匀、亮度柔和的颜色 */
+  function hueFor(i,n){return (i*360/n+12)%360;}
+  function buildPalette(n){
+    var colors=[],names=[];
+    for(var i=0;i<n;i++){
+      var h=hueFor(i,n);
+      colors.push('hsl('+Math.round(h)+',56%,86%)');
+      names.push(HUE_NAMES[Math.floor(h/360*HUE_NAMES.length)%HUE_NAMES.length]);
+    }
+    return {colors:colors,names:names};
+  }
+  /* 确定性着色：相邻区域尽量取色相距离最远的颜色 */
+  function assignRegionColors(n,region){
+    var adj=[];
+    for(var i=0;i<n;i++)adj.push([]);
+    for(var idx=0;idx<n*n;idx++){
+      var r=Math.floor(idx/n),c=idx%n,a=region[idx],b;
+      if(c+1<n){b=region[idx+1];if(b!==a){adj[a].push(b);adj[b].push(a);}}
+      if(r+1<n){b=region[idx+n];if(b!==a){adj[a].push(b);adj[b].push(a);}}
+    }
+    var order=[];
+    for(var i=0;i<n;i++)order.push({rid:i,d:adj[i].length});
+    order.sort(function(a,b){return b.d-a.d||a.rid-b.rid;});
+    var colorOf=new Array(n).fill(-1),used={};
+    for(var q=0;q<order.length;q++){
+      var rid=order[q].rid,best=0,bestScore=-1;
+      for(var k=0;k<n;k++){
+        var gap=n;
+        for(var j=0;j<adj[rid].length;j++){
+          var nc=colorOf[adj[rid][j]];
+          if(nc<0)continue;
+          var d=Math.abs(k-nc);d=Math.min(d,n-d);
+          if(d<gap)gap=d;
+        }
+        var score=gap*10+(used[k]?0:3)+(n-k)*0.0001;
+        if(score>bestScore){bestScore=score;best=k;}
+      }
+      colorOf[rid]=best;used[best]=1;
+    }
+    return colorOf;
+  }
+  function regionName(rid){return G.names[G.colorOf[rid]];}
+  function issueText(it){
+    if(it.type==='row')return '第 '+(it.index+1)+' 行有 '+it.count+' 只熊熊';
+    if(it.type==='col')return '第 '+(it.index+1)+' 列有 '+it.count+' 只熊熊';
+    return '第 '+(it.index+1)+' 块色块（'+regionName(it.index)+'）有 '+it.count+' 只熊熊';
+  }
+  function setFeedback(kind,icon,text){
+    el('feedback').className='feedback'+(kind?' '+kind:'');
+    el('feedbackIcon').textContent=icon;
+    el('feedbackText').textContent=text;
+  }
+  function flash(kind,icon,text,ms){
+    if(!G)return;
+    var delay=ms||2600;
+    G.flash={kind:kind,icon:icon,text:text,until:Date.now()+delay};
+    render();
+    setTimeout(function(){
+      if(G&&G.flash&&Date.now()>=G.flash.until){G.flash=null;render();}
+    },delay+80);
+  }
+  function showLoading(on,text){
+    el('loading').hidden=!on;
+    if(text)el('loadingText').textContent=text;
+  }
+
+  function edgeStyle(idx){
+    var n=G.n,r=Math.floor(idx/n),c=idx%n,rid=G.region[idx];
+    function same(rr,cc){
+      return rr>=0&&rr<n&&cc>=0&&cc<n&&G.region[rr*n+cc]===rid;
+    }
+    var thick='3px',thin='1px',dark='var(--region-line)',light='rgba(109,91,75,.17)';
+    return {
+      borderTopWidth:(r===0||!same(r-1,c))?thick:thin,
+      borderTopColor:(r===0||!same(r-1,c))?dark:light,
+      borderLeftWidth:(c===0||!same(r,c-1))?thick:thin,
+      borderLeftColor:(c===0||!same(r,c-1))?dark:light,
+      borderRightWidth:(c===n-1)?thick:'0px',
+      borderRightColor:dark,
+      borderBottomWidth:(r===n-1)?thick:'0px',
+      borderBottomColor:dark,
+      backgroundColor:G.colors[G.colorOf[rid]]
+    };
+  }
+
+  function buildBoardDom(){
+    boardEl.innerHTML='';
+    boardEl.style.gridTemplateColumns='repeat('+G.n+',1fr)';
+    boardEl.style.gridTemplateRows='repeat('+G.n+',1fr)';
+    boardEl.style.setProperty('--n',G.n);
+    cellEls=[];
+    var frag=document.createDocumentFragment();
+    for(var i=0;i<G.n*G.n;i++){
+      var b=document.createElement('button');
+      b.type='button';b.className='cell';b.dataset.idx=i;
+      var s=edgeStyle(i);
+      for(var k in s)b.style[k]=s[k];
+      frag.appendChild(b);
+      cellEls.push(b);
+    }
+    boardEl.appendChild(frag);
+    G.lastRender=new Array(G.n*G.n).fill(null);
+  }
+
+  function renderSubProgress(){
+    var html='';
+    for(var k=1;k<=SUBS;k++){
+      var done=k<G.sub||(G.subDone&&k===G.sub);
+      var cls=done?'done':(k===G.sub?'current':'todo');
+      var label=done?'✓':String(k);
+      html+='<span class="sub-dot '+cls+'" title="第 '+k+' 小关'+(done?'（已完成）':(k===G.sub?'（当前）':'（未开始）'))+'">'+label+'</span>';
+    }
+    el('subProgress').innerHTML=html;
+  }
+
+  function updateLevelBar(){
+    var rec=save.records[G.level];
+    el('levelTitle').textContent='第 '+G.level+' 关 · 第 '+G.sub+' / '+SUBS+' 小关 · '+G.n+' × '+G.n;
+    if(rec&&rec.clears>0){
+      el('levelBest').textContent='大关最佳 '+fmtTime(rec.bestTime)+' · '+rec.bestSteps+' 步 · 已通关 '+rec.clears+' 次';
+    }else{
+      var done=(G.sub-1)+(G.subDone?1:0);
+      el('levelBest').textContent='本次进度 '+done+' / '+SUBS+' 小关 · 已解锁 '+save.unlocked+' 关';
+    }
+  }
+
+  function render(force){
+    if(!G)return;
+    var ev=BearLogic.evaluate(G.n,G.region,G.cells),n=G.n;
+    var badRegions={};
+    for(var q=0;q<ev.issues.length;q++){
+      if(ev.issues[q].type==='region')badRegions[ev.issues[q].index]=1;
+    }
+    for(var i=0;i<n*n;i++){
+      var st=G.cells[i];
+      var conflict=ev.conflicts.has(i);
+      var regionHint=!!badRegions[G.region[i]];
+      var isWin=G.won&&st===1;
+      var key=st+'|'+(conflict?1:0)+'|'+(regionHint?1:0)+'|'+(isWin?1:0);
+      var cell=cellEls[i];
+      if(force||G.lastRender[i]!==key){
+        cell.className='cell'+(conflict?' is-conflict':'')+(regionHint?' in-conflict-region':'')+(isWin?' is-win':'');
+        if(st===1){
+          cell.innerHTML='<span class="bear" role="img" aria-label="熊熊">🐻</span>';
+          if(isWin)cell.firstChild.style.animationDelay=(i*14)+'ms';
+        }else if(st===2){
+          cell.innerHTML='<span class="cross" aria-hidden="true">✕</span>';
+        }else cell.innerHTML='';
+        var r=Math.floor(i/n),c=i%n;
+        var stateText=st===1?'已放熊熊':(st===2?'排除笔记':'空格');
+        cell.setAttribute('aria-label','第 '+(r+1)+' 行第 '+(c+1)+' 列，'+regionName(G.region[i])+'区域，'+stateText+(conflict?'，冲突':''));
+        G.lastRender[i]=key;
+      }
+    }
+    el('stepVal').textContent=G.steps;
+    el('placedVal').textContent=ev.placed+' / '+n;
+    el('conflictVal').textContent=ev.conflicts.size;
+    el('conflictVal').className='v '+(ev.conflicts.size?'warn':'good');
+
+    if(ev.solved&&!G.won){win();render(true);return;}
+
+    if(G.flash&&Date.now()<G.flash.until&&!ev.solved){
+      setFeedback(G.flash.kind,G.flash.icon,G.flash.text);
+    }else if(ev.solved){
+      setFeedback('success','🎉','第 '+G.level+' 关 · 第 '+G.sub+' 小关已完成，成绩已保存在本机。');
+    }else if(gesture.swiping){
+      setFeedback('info','✕','涂抹中：滑过的格子连续'+(gesture.state===2?'打叉':'擦除')+'，松手结束。');
+    }else if(ev.issues.length){
+      var parts=ev.issues.slice(0,3).map(issueText);
+      var more=ev.issues.length>3?'，另有 '+(ev.issues.length-3)+' 处冲突':'';
+      setFeedback('warn','⚠️','冲突：'+parts.join('；')+more+'。取消一只即可继续。');
+    }else if(ev.placed===0){
+      setFeedback('','🐾','点击放熊熊；右键或「打叉」做排除笔记，手机长按滑动可整行打叉。');
+    }else{
+      setFeedback('info','🐾','目前没有冲突，已放 '+ev.placed+' / '+n+' 只熊熊，还差 '+(n-ev.placed)+' 只。');
+    }
+  }
+
+  function win(){
+    G.won=true;G.subDone=true;G.flash=null;
+    clearTimeout(progressTimer);
+    var L=G.level,S=G.sub,n=G.n;
+    var totalTime=G.runTime+G.elapsed,totalSteps=G.runSteps+G.steps;
+    var rec=save.records[L]||{clears:0,bestTime:null,bestSteps:null,subs:{}};
+    if(!rec.subs||typeof rec.subs!=='object')rec.subs={};
+    var sr=rec.subs[S]||{plays:0,bestTime:null,bestSteps:null};
+    var subTimeRec=sr.bestTime==null||G.elapsed<sr.bestTime;
+    var subStepsRec=sr.bestSteps==null||G.steps<sr.bestSteps;
+    sr.plays=(sr.plays||0)+1;
+    if(subTimeRec)sr.bestTime=G.elapsed;
+    if(subStepsRec)sr.bestSteps=G.steps;
+    sr.lastTime=G.elapsed;sr.lastSteps=G.steps;sr.lastAt=new Date().toISOString();
+    rec.subs[S]=sr;
+    save.records[L]=rec;
+
+    var lines=[],title='',emoji='';
+    if(S<SUBS){
+      save.progress[L]={sub:S+1,runSteps:totalSteps,runTime:totalTime,board:null,cells:null,steps:0,elapsed:0};
+      G.nextAction={type:'nextSub'};
+      title='第 '+S+' / '+SUBS+' 小关完成！';
+      emoji='🐾✨';
+      lines.push('第 '+L+' 关 · 第 '+S+' 小关：用时 '+fmtTime(G.elapsed)+' · '+G.steps+' 步');
+      lines.push('大关进度 '+S+' / '+SUBS+' 小关 · 累计 '+fmtTime(totalTime)+' / '+totalSteps+' 步');
+      lines.push('再完成 '+(SUBS-S)+' 个小关，就能解锁第 '+(L+1)+' 关（'+(n+1)+' × '+(n+1)+'）');
+      if(subTimeRec||subStepsRec){
+        lines.push('🏆 刷新本小关纪录：'+[subTimeRec?'最快用时':null,subStepsRec?'最少步数':null].filter(Boolean).join(' · '));
+      }
+      lines.push('本小关最佳 '+fmtTime(sr.bestTime)+' / '+sr.bestSteps+' 步 · 已玩 '+sr.plays+' 次');
+      el('winNext').textContent='进入第 '+(S+1)+' 小关';
+    }else{
+      var firstClear=!rec.clears;
+      var newTime=rec.bestTime==null||totalTime<rec.bestTime;
+      var newSteps=rec.bestSteps==null||totalSteps<rec.bestSteps;
+      rec.clears=(rec.clears||0)+1;
+      if(newTime)rec.bestTime=totalTime;
+      if(newSteps)rec.bestSteps=totalSteps;
+      rec.lastTime=totalTime;rec.lastSteps=totalSteps;rec.lastAt=new Date().toISOString();
+      save.records[L]=rec;
+      delete save.progress[L];
+      var unlockedNew=save.unlocked<L+1;
+      if(unlockedNew)save.unlocked=L+1;
+      G.nextAction={type:'nextLevel'};
+      title='第 '+L+' 关 · '+SUBS+' 小关全通关！';
+      emoji='🐻🎉';
+      lines.push('本大关总用时 '+fmtTime(totalTime)+' · 共 '+totalSteps+' 步（'+SUBS+' 个小关）');
+      if(unlockedNew)lines.push('🎉 第 '+(L+1)+' 关已解锁：'+(n+1)+' × '+(n+1)+'，棋盘增加一行一列');
+      else lines.push(firstClear?'首通成功！':'本关成绩已更新，可以反复挑战更快纪录');
+      if(newTime||newSteps){
+        lines.push('🏆 刷新纪录：'+[newTime?'最快总用时':null,newSteps?'最少总步数':null].filter(Boolean).join(' · '));
+      }
+      lines.push('大关最佳 '+fmtTime(rec.bestTime)+' / '+rec.bestSteps+' 步 · 累计通关 '+rec.clears+' 次');
+      el('winNext').textContent='进入第 '+(L+1)+' 关';
+    }
+    persist();updateLevelBar();renderSubProgress();
+    el('winEmoji').textContent=emoji;
+    el('winTitle').textContent=title;
+    el('winText').textContent=lines.filter(Boolean).join('\n');
+    el('winModal').hidden=false;
+    setFeedback('success','🎉',S<SUBS
+      ?('第 '+S+' 小关完成！进度已保存，下一小关是全新棋盘。')
+      :('第 '+L+' 关全通关！成绩已保存，下一关已解锁。'));
+    vibrate([18,40,18]);
+  }
+
+  function pushHistory(){
+    G.history.push(G.cells.slice());
+    if(G.history.length>60)G.history.shift();
+  }
+  function handleCell(idx,state){
+    if(!G||G.won)return;
+    pushHistory();
+    G.cells[idx]=(G.cells[idx]===state)?0:state;
+    G.steps++;G.flash=null;
+    saveProgress();render();
+  }
+  function undo(){
+    if(!G||G.won)return;
+    if(!G.history.length){flash('','↩️','没有可撤销的操作。',1700);return;}
+    G.cells=G.history.pop();G.steps++;
+    saveProgress();vibrate(8);
+    flash('info','↩️','已撤销上一步。',1600);
+  }
+  function restart(){
+    if(!G)return;
+    pushHistory();
+    G.cells=new Array(G.n*G.n).fill(0);
+    G.steps=0;G.elapsed=0;G.start=Date.now();G.pauseAt=0;G.won=false;G.flash=null;
+    el('winModal').hidden=true;
+    el('timeVal').textContent='00:00';
+    saveProgress();
+    flash('','🔄','第 '+G.level+' 关 · 第 '+G.sub+' 小关已清空，棋盘不变。',2200);
+  }
+  function shuffleBoard(){
+    if(!G)return;
+    showLoading(true,'正在重新随机生成棋盘…');
+    el('winModal').hidden=true;
+    setTimeout(function(){
+      var data=BearLogic.generate(G.n);
+      G.region=data.region.slice();G.perm=data.perm.slice();
+      G.colorOf=assignRegionColors(G.n,G.region);
+      G.cells=new Array(G.n*G.n).fill(0);
+      G.steps=0;G.elapsed=0;G.start=Date.now();G.pauseAt=0;
+      G.won=false;G.subDone=false;G.flash=null;G.history=[];
+      buildBoardDom();saveProgress();
+      showLoading(false);
+      el('timeVal').textContent='00:00';
+      flash('','🔀','已换一张全新随机棋盘，第 '+G.sub+' 小关重新开始。',2400);
+    },30);
+  }
+  function setMode(mode){
+    if(!G)return;
+    G.mode=mode;
+    var buttons=el('modePicker').querySelectorAll('button');
+    for(var i=0;i<buttons.length;i++)buttons[i].classList.toggle('active',buttons[i].dataset.mode===mode);
+  }
+  function hint(){
+    if(!G||G.won)return;
+    var sol=BearLogic.findSolution(G.n,G.region,G.cells,G.perm);
+    if(!sol){flash('warn','🤔','当前熊熊位置已无法完成，先取消冲突或位置不对的熊熊吧。');return;}
+    var rows=[];
+    for(var r=0;r<G.n;r++){
+      var has=false;
+      for(var c=0;c<G.n;c++)if(G.cells[r*G.n+c]===1){has=true;break;}
+      if(!has)rows.push(r);
+    }
+    if(!rows.length){flash('info','🐻','熊熊都放好了，检查一下有没有冲突吧。');return;}
+    pushHistory();
+    var r=rows[Math.floor(Math.random()*rows.length)];
+    G.cells[r*G.n+sol[r]]=1;G.steps++;
+    saveProgress();
+    flash('success','💡','提示：第 '+(r+1)+' 行可以在这里放一只熊熊。');
+  }
+  function check(){
+    if(!G||G.won)return;
+    var sol=BearLogic.findSolution(G.n,G.region,G.cells,G.perm);
+    if(sol)flash('info','✅','检查通过：当前局面仍有可行的完成方式，继续找！');
+    else flash('warn','⚠️','检查发现：按现在的熊熊位置已无法完成，试着取消几只重新摆。');
+  }
+
+  /* 触屏长按滑动：连续打叉 / 从叉上起手则连续擦除 */
+  function startSwipe(){
+    if(!gesture.active||!G||G.won)return;
+    gesture.swiping=true;gesture.visited={};gesture.changed=0;
+    gesture.state=G.cells[gesture.startIdx]===2?0:2;
+    pushHistory();
+    applySwipeAt(gesture.startIdx);
+    boardEl.classList.add('is-swiping');
+    vibrate(12);
+    render();
+  }
+  function applySwipeAt(idx){
+    if(!G||idx<0||idx>=G.n*G.n||gesture.visited[idx])return;
+    gesture.visited[idx]=1;
+    if(G.cells[idx]===gesture.state)return;
+    G.cells[idx]=gesture.state;gesture.changed++;
+    saveProgress();
+    render();
+  }
+  function endGesture(){
+    clearTimeout(gesture.timer);
+    var was=gesture.swiping,changed=gesture.changed,state=gesture.state;
+    gesture.active=false;gesture.swiping=false;
+    boardEl.classList.remove('is-swiping');
+    if(was&&G){
+      suppressClick=true;
+      setTimeout(function(){suppressClick=false;},450);
+      G.steps++;saveProgress();vibrate(8);
+      flash('info','✕','已连续'+(state===2?'打叉':'擦除')+' '+changed+' 格。',1700);
+    }
+  }
+  boardEl.addEventListener('touchstart',function(e){
+    if(!G||G.won||e.touches.length!==1)return;
+    var t=e.touches[0],cell=e.target.closest?e.target.closest('.cell'):null;
+    if(!cell||!boardEl.contains(cell))return;
+    gesture.active=true;gesture.swiping=false;
+    gesture.startIdx=Number(cell.dataset.idx);
+    gesture.x=t.clientX;gesture.y=t.clientY;
+    clearTimeout(gesture.timer);
+    gesture.timer=setTimeout(startSwipe,320);
+  },{passive:true});
+  boardEl.addEventListener('touchmove',function(e){
+    if(!gesture.active)return;
+    var t=e.touches[0];if(!t)return;
+    if(!gesture.swiping){
+      if(Math.abs(t.clientX-gesture.x)>10||Math.abs(t.clientY-gesture.y)>10){
+        clearTimeout(gesture.timer);gesture.active=false;
+      }
+      return;
+    }
+    e.preventDefault();
+    var node=document.elementFromPoint(t.clientX,t.clientY);
+    var cell=node&&node.closest?node.closest('.cell'):null;
+    if(cell&&boardEl.contains(cell))applySwipeAt(Number(cell.dataset.idx));
+  },{passive:false});
+  boardEl.addEventListener('touchend',endGesture);
+  boardEl.addEventListener('touchcancel',endGesture);
+
+  boardEl.addEventListener('click',function(e){
+    if(suppressClick){suppressClick=false;return;}
+    var cell=e.target.closest('.cell');
+    if(!cell||!G)return;
+    handleCell(Number(cell.dataset.idx),G.mode==='bear'?1:2);
+  });
+  boardEl.addEventListener('contextmenu',function(e){
+    var cell=e.target.closest('.cell');
+    if(!cell||!G)return;
+    e.preventDefault();
+    handleCell(Number(cell.dataset.idx),2);
+  });
+
+  function buildLevelPanel(){
+    var total=Math.max(save.unlocked+2,8),html='';
+    for(var L=1;L<=total;L++){
+      var n=sizeForLevel(L),rec=save.records[L],pr=save.progress[L];
+      var unlocked=L<=save.unlocked,cleared=!!rec&&rec.clears>0;
+      var doneSubs=pr?Math.max(0,Math.min(SUBS,Number(pr.sub)-1)):(cleared?SUBS:0);
+      var cls='level-card'+(cleared?' cleared':'')+(unlocked?'':' locked')+(G&&L===G.level?' current':'');
+      var desc;
+      if(cleared)desc='✓ 通关 '+rec.clears+' 次 · 最佳 '+fmtTime(rec.bestTime)+' / '+rec.bestSteps+' 步'+(pr?' · 重玩中 '+doneSubs+'/'+SUBS:'');
+      else if(unlocked)desc='进度 '+doneSubs+' / '+SUBS+' 小关'+(pr&&pr.runTime?' · 累计 '+fmtTime(pr.runTime):'');
+      else desc='完成第 '+(L-1)+' 关的 '+SUBS+' 小关解锁';
+      var pct=cleared?100:Math.round(doneSubs/SUBS*100);
+      html+='<button type="button" class="'+cls+'" data-level="'+L+'" '+(unlocked?'':'disabled')+'>'+
+        '<span class="lv-no">'+(cleared?'✓':(unlocked?L:'🔒'))+'</span>'+
+        '<span class="lv-name">第 '+L+' 关</span>'+
+        '<span class="lv-size">'+n+' × '+n+' · '+SUBS+' 小关</span>'+
+        '<span class="lv-rec">'+desc+'</span>'+
+        '<span class="lv-bar"><i style="width:'+pct+'%"></i></span></button>';
+    }
+    el('levelGrid').innerHTML=html;
+    /* 当前大关的 10 个小关成绩明细 */
+    var cur=G?G.level:1,curRec=save.records[cur]||{},subs=curRec.subs||{},subHtml='';
+    el('subRecLevel').textContent=cur;
+    for(var k=1;k<=SUBS;k++){
+      var r=subs[k];
+      subHtml+='<span>第 '+k+' 小关：<b>'+(r&&r.plays
+        ?(fmtTime(r.bestTime)+' / '+r.bestSteps+' 步 · '+r.plays+' 次')
+        :'尚未完成')+'</b></span>';
+    }
+    el('subRecList').innerHTML=subHtml;
+    el('storageNote').textContent=storageOK
+      ?'每小关与整关成绩、未完成局面保存在本机浏览器；已通关的大关再次进入会从第 1 小关重新挑战全新棋盘。'
+      :'当前环境无法写入本地存储，成绩仅在本次会话有效。';
+  }
+  function openLevels(){
+    buildLevelPanel();
+    el('levelModal').hidden=false;
+    el('winModal').hidden=true;
+  }
+
+  function loadLevel(level,opts){
+    opts=opts||{};
+    level=Math.max(1,Number(level)||1);
+    var n=sizeForLevel(level);
+    showLoading(true,'正在随机生成第 '+level+' 关的棋盘…');
+    setFeedback('','🐻','正在随机生成棋盘…');
+    setTimeout(function(){
+      if(opts.fresh){delete save.progress[level];persist();}
+      var pr=normalizeProgress(save.progress[level],n);
+      var board=(pr&&pr.board)?pr.board:BearLogic.generate(n);
+      var palette=buildPalette(n);
+      var mode=G?G.mode:'bear';
+      var resumed=!!(pr&&pr.board&&pr.cells);
+      G={
+        level:level,sub:pr?pr.sub:1,n:n,
+        region:board.region.slice(),perm:board.perm.slice(),
+        colorOf:assignRegionColors(n,board.region),
+        colors:palette.colors,names:palette.names,
+        cells:resumed?pr.cells.slice():new Array(n*n).fill(0),
+        mode:mode,steps:resumed?pr.steps:0,elapsed:resumed?pr.elapsed:0,
+        runSteps:pr?pr.runSteps:0,runTime:pr?pr.runTime:0,
+        start:Date.now()-(resumed?pr.elapsed*1000:0),pauseAt:0,
+        won:false,subDone:false,flash:null,history:[],lastRender:null,nextAction:null
+      };
+      saveProgress();
+      buildBoardDom();renderSubProgress();updateLevelBar();
+      showLoading(false);
+      el('winModal').hidden=true;el('levelModal').hidden=true;
+      el('timeVal').textContent=fmtTime(G.elapsed);
+      if(resumed)flash('info','📂','已恢复第 '+level+' 关 · 第 '+G.sub+' 小关上次的棋盘与进度。',3000);
+      else flash('','🐻','第 '+level+' 关 · 第 '+G.sub+' / '+SUBS+' 小关 · '+n+' × '+n+'，全新随机棋盘。',3200);
+    },30);
+  }
+
+  el('modePicker').addEventListener('click',function(e){
+    var b=e.target.closest('button');if(b)setMode(b.dataset.mode);
+  });
+  el('undoBtn').addEventListener('click',undo);
+  el('hintBtn').addEventListener('click',hint);
+  el('checkBtn').addEventListener('click',check);
+  el('restartBtn').addEventListener('click',restart);
+  el('shuffleBtn').addEventListener('click',shuffleBoard);
+  el('levelBtn').addEventListener('click',openLevels);
+  el('levelGrid').addEventListener('click',function(e){
+    var b=e.target.closest('.level-card');
+    if(b&&!b.disabled)loadLevel(Number(b.dataset.level));
+  });
+  el('closeLevels').addEventListener('click',function(){
+    el('levelModal').hidden=true;
+    if(G&&G.won)el('winModal').hidden=false;
+  });
+  el('winNext').addEventListener('click',function(){
+    if(!G||!G.nextAction)return;
+    if(G.nextAction.type==='nextLevel')loadLevel(G.level+1);
+    else loadLevel(G.level);
+  });
+  el('winReplay').addEventListener('click',function(){loadLevel(G.level,{fresh:true});});
+  el('winLevels').addEventListener('click',openLevels);
+  el('resetLevelBtn').addEventListener('click',function(){
+    if(!G)return;
+    loadLevel(G.level,{fresh:true});
+  });
+  el('clearBtn').addEventListener('click',function(){
+    if(!confirmClear){
+      confirmClear=true;
+      el('clearBtn').textContent='再点一次确认清空';
+      clearTimer=setTimeout(function(){
+        confirmClear=false;el('clearBtn').textContent='清空本地成绩';
+      },4000);
+      return;
+    }
+    clearTimeout(clearTimer);confirmClear=false;
+    el('clearBtn').textContent='清空本地成绩';
+    save=defaultSave();persist();buildLevelPanel();loadLevel(1,{fresh:true});
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      if(!el('levelModal').hidden){el('levelModal').hidden=true;if(G&&G.won)el('winModal').hidden=false;}
+      else if(!el('winModal').hidden&&!(G&&G.won))el('winModal').hidden=true;
+      return;
+    }
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    var k=e.key.toLowerCase();
+    if(k==='z')undo();
+    else if(k==='x'&&G)setMode(G.mode==='bear'?'cross':'bear');
+  });
+  document.addEventListener('visibilitychange',function(){
+    if(!G||G.won)return;
+    if(document.hidden){G.pauseAt=Date.now();flushProgress();}
+    else if(G.pauseAt){G.start+=Date.now()-G.pauseAt;G.pauseAt=0;}
+  });
+  window.addEventListener('pagehide',flushProgress);
+  setInterval(function(){
+    if(!G||G.won||document.hidden||el('loading').hidden===false)return;
+    G.elapsed=Math.floor((Date.now()-G.start)/1000);
+    el('timeVal').textContent=fmtTime(G.elapsed);
+  },250);
+
+  save=loadSave();
+  /* 优先回到真正留有标记的局面，其次回到最近玩过的关卡，否则进入最新解锁的一关 */
+  var startLevel=save.unlocked,maxProgress=0,maxActive=0;
+  for(var key in save.progress){
+    var lv=Number(key),pr=save.progress[key];
+    if(lv<1||lv>save.unlocked)continue;
+    if(lv>maxProgress)maxProgress=lv;
+    if(pr&&Array.isArray(pr.cells)){
+      var touched=false;
+      for(var i=0;i<pr.cells.length;i++)if(pr.cells[i]===1||pr.cells[i]===2){touched=true;break;}
+      if(touched&&lv>maxActive)maxActive=lv;
+    }
+  }
+  if(maxActive)startLevel=maxActive;
+  else if(maxProgress)startLevel=maxProgress;
+  loadLevel(startLevel);
+  if(!storageOK){
+    setTimeout(function(){
+      if(G)flash('warn','⚠️','当前环境无法写入本地存储，成绩仅在本次会话内有效。',4200);
+    },400);
+  }
+})();
+</script>
+</body>
+</html>
