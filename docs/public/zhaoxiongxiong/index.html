@@ -241,14 +241,14 @@ details.rules b{color:var(--accent)}
     <span><i class="cross-dot">✕</i>排除笔记</span>
     <span><i class="conflict-dot"></i>冲突位置</span>
     <span><i style="background:hsl(280,56%,86%)"></i>彩色块 = 一个区域</span>
-    <span class="tip">手机操作：长按格子并滑动可整行快速打叉，从已有叉上起手则是整行擦除</span>
+    <span class="tip">手机操作：按住格子直接滑动即可连续打叉，从已有叉上起手则是连续擦除（不用等长按）</span>
   </div>
 
   <details class="rules">
     <summary>玩法与闯关说明</summary>
     <ol>
       <li>棋盘被分成若干块<b>彩色区域</b>，每个区域、每一行、每一列都<b>有且仅有一只熊熊</b>。</li>
-      <li>点击放熊熊，再点一次取消；右键或切换「打叉」做排除笔记，笔记不参与判定。手机上<b>长按并滑动</b>可连续打叉或擦除。</li>
+      <li>点击放熊熊，再点一次取消；右键或切换「打叉」做排除笔记，笔记不参与判定。手机上<b>按住格子滑动</b>即可连续打叉或擦除，不必等长按；从已有叉上起手则是擦除。</li>
       <li>同一行、列或色块出现两只熊熊时会标红并给出具体冲突提示，冲突涉及的色块也会整体描边。</li>
       <li>每一大关含 <b>10 个小关</b>，<b>全部 10 个小关完成才解锁下一大关</b>；每过一大关棋盘增加一行一列。已解锁的大关可反复重玩。</li>
       <li><b>每小关棋盘都随机生成，没有固定布局</b>：下一小关、重玩、点「换一盘」都会得到全新棋盘；只有中途退出后回来会恢复原来那盘。</li>
@@ -581,8 +581,9 @@ var BearLogic = (function(){
   var HUE_NAMES=['珊瑚红','蜜桃粉','杏子橙','暖沙黄','柠檬黄','嫩芽黄绿','嫩芽绿','薄荷绿','湖水青','天青蓝','晴空蓝','靛青蓝','薰衣草紫','紫罗兰','玫瑰紫','玫红粉'];
   function el(id){return document.getElementById(id);}
   var boardEl=el('board'),cellEls=[];
-  var G=null,save=null,storageOK=true,progressTimer=null,suppressClick=false;
+  var G=null,save=null,storageOK=true,progressTimer=null,suppressUntil=0;
   var gesture={active:false,swiping:false,timer:null,startIdx:-1,x:0,y:0,state:2,visited:{},changed:0};
+  var SWIPE_HOLD=260,SWIPE_SLOP=16,SUPPRESS_MS=650;
   var confirmClear=false,clearTimer=null;
 
   function sizeForLevel(level){return level+4;}
@@ -832,7 +833,7 @@ var BearLogic = (function(){
       var more=ev.issues.length>3?'，另有 '+(ev.issues.length-3)+' 处冲突':'';
       setFeedback('warn','⚠️','冲突：'+parts.join('；')+more+'。取消一只即可继续。');
     }else if(ev.placed===0){
-      setFeedback('','🐾','点击放熊熊；右键或「打叉」做排除笔记，手机长按滑动可整行打叉。');
+      setFeedback('','🐾','点击放熊熊；右键或「打叉」做排除笔记，手机按住格子滑动即可连续打叉。');
     }else{
       setFeedback('info','🐾','目前没有冲突，已放 '+ev.placed+' / '+n+' 只熊熊，还差 '+(n-ev.placed)+' 只。');
     }
@@ -979,9 +980,18 @@ var BearLogic = (function(){
     else flash('warn','⚠️','检查发现：按现在的熊熊位置已无法完成，试着取消几只重新摆。');
   }
 
-  /* 触屏长按滑动：连续打叉 / 从叉上起手则连续擦除 */
+  /* 触屏：按住格子直接滑动即连续打叉，原地长按同样进入涂抹；从叉上起手则连续擦除。
+     移动端长按常会补发合成 click / contextmenu，若不屏蔽会把刚打上的起手格叉 toggle 掉。
+     抑制只作用于本次涂抹经过的格子，手势后立刻点击别的格子仍然有效。 */
+  function ignoreGestureEvent(e){
+    if(gesture.swiping)return true;
+    if(Date.now()>=suppressUntil)return false;
+    var cell=e&&e.target&&e.target.closest?e.target.closest('.cell'):null;
+    return !!cell&&gesture.visited[Number(cell.dataset.idx)]===1;
+  }
   function startSwipe(){
-    if(!gesture.active||!G||G.won)return;
+    if(!gesture.active||!G||G.won||gesture.swiping)return;
+    clearTimeout(gesture.timer);
     gesture.swiping=true;gesture.visited={};gesture.changed=0;
     gesture.state=G.cells[gesture.startIdx]===2?0:2;
     pushHistory();
@@ -998,14 +1008,18 @@ var BearLogic = (function(){
     saveProgress();
     render();
   }
+  function swipeAtPoint(x,y){
+    var node=document.elementFromPoint(x,y);
+    var cell=node&&node.closest?node.closest('.cell'):null;
+    if(cell&&boardEl.contains(cell))applySwipeAt(Number(cell.dataset.idx));
+  }
   function endGesture(){
     clearTimeout(gesture.timer);
     var was=gesture.swiping,changed=gesture.changed,state=gesture.state;
     gesture.active=false;gesture.swiping=false;
     boardEl.classList.remove('is-swiping');
     if(was&&G){
-      suppressClick=true;
-      setTimeout(function(){suppressClick=false;},450);
+      suppressUntil=Date.now()+SUPPRESS_MS;
       G.steps++;saveProgress();vibrate(8);
       flash('info','✕','已连续'+(state===2?'打叉':'擦除')+' '+changed+' 格。',1700);
     }
@@ -1018,27 +1032,24 @@ var BearLogic = (function(){
     gesture.startIdx=Number(cell.dataset.idx);
     gesture.x=t.clientX;gesture.y=t.clientY;
     clearTimeout(gesture.timer);
-    gesture.timer=setTimeout(startSwipe,320);
+    gesture.timer=setTimeout(startSwipe,SWIPE_HOLD);
   },{passive:true});
   boardEl.addEventListener('touchmove',function(e){
     if(!gesture.active)return;
     var t=e.touches[0];if(!t)return;
     if(!gesture.swiping){
-      if(Math.abs(t.clientX-gesture.x)>10||Math.abs(t.clientY-gesture.y)>10){
-        clearTimeout(gesture.timer);gesture.active=false;
-      }
-      return;
+      /* 按下后直接滑动也立即进入涂抹，不必等满长按时长；微小抖动仍视为普通点击 */
+      if(Math.abs(t.clientX-gesture.x)<=SWIPE_SLOP&&Math.abs(t.clientY-gesture.y)<=SWIPE_SLOP)return;
+      startSwipe();
     }
     e.preventDefault();
-    var node=document.elementFromPoint(t.clientX,t.clientY);
-    var cell=node&&node.closest?node.closest('.cell'):null;
-    if(cell&&boardEl.contains(cell))applySwipeAt(Number(cell.dataset.idx));
+    swipeAtPoint(t.clientX,t.clientY);
   },{passive:false});
   boardEl.addEventListener('touchend',endGesture);
   boardEl.addEventListener('touchcancel',endGesture);
 
   boardEl.addEventListener('click',function(e){
-    if(suppressClick){suppressClick=false;return;}
+    if(ignoreGestureEvent(e)){e.preventDefault();return;}
     var cell=e.target.closest('.cell');
     if(!cell||!G)return;
     handleCell(Number(cell.dataset.idx),G.mode==='bear'?1:2);
@@ -1047,6 +1058,7 @@ var BearLogic = (function(){
     var cell=e.target.closest('.cell');
     if(!cell||!G)return;
     e.preventDefault();
+    if(ignoreGestureEvent(e))return;
     handleCell(Number(cell.dataset.idx),2);
   });
 
