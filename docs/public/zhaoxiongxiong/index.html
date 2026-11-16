@@ -23,54 +23,61 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none !important}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none}
 body{
   background:var(--bg);color:var(--ink);
   font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,-apple-system,sans-serif;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
 }
-.app{max-width:620px;margin:0 auto;padding:22px 16px 44px}
-header{text-align:center;margin-bottom:14px}
-h1{margin:0;font-size:clamp(27px,6.2vw,38px);letter-spacing:3px;font-weight:800}
+/* 整页固定为一屏：主界面不滚动，棋盘区占据剩余空间 */
+.app{
+  max-width:620px;margin:0 auto;
+  height:100vh;height:100dvh;
+  padding:calc(10px + env(safe-area-inset-top)) 16px calc(8px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;overflow:hidden;
+}
+header{flex:0 0 auto;text-align:center;margin-bottom:8px}
+h1{margin:0;font-size:clamp(22px,5vw,30px);letter-spacing:2px;font-weight:800}
 h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
-.sub{margin:6px 0 14px;color:var(--muted);font-size:12.5px;line-height:1.7}
+.sub{margin:4px 0 8px;color:var(--muted);font-size:11.5px;line-height:1.5}
 .level-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:var(--card);border:1px solid var(--line);border-radius:14px;
-  padding:10px 12px;text-align:left
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:7px 10px;text-align:left
 }
-.level-bar .lv-main{display:flex;flex-direction:column;gap:2px;min-width:0}
-.level-bar .lv-title{font-size:15px;font-weight:800;color:var(--accent)}
-.level-bar .lv-best{font-size:11.5px;color:var(--muted)}
+.level-bar .lv-main{display:flex;flex-direction:column;gap:1px;min-width:0}
+.level-bar .lv-title{font-size:13.5px;font-weight:800;color:var(--accent)}
+.level-bar .lv-best{font-size:11px;color:var(--muted)}
 .level-bar .btn{flex:0 0 auto}
-.sub-progress{display:flex;gap:5px;margin:10px 0 0}
+.sub-progress{display:flex;gap:4px;margin:7px 0 0}
 .sub-dot{
-  flex:1;min-width:0;height:22px;border-radius:7px;
+  flex:1;min-width:0;height:18px;border-radius:6px;
   display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;
+  font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;
   border:1px solid var(--line);background:var(--card);color:var(--muted);
   transition:background .2s,color .2s,border-color .2s,transform .2s
 }
 .sub-dot.done{background:var(--ok-soft);border-color:#bfdfc9;color:var(--ok)}
 .sub-dot.current{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(169,113,63,.3);transform:translateY(-1px)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 4px;text-align:center}
-.stat .k{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
-.stat .v{display:block;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.stats{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:5px 4px;text-align:center}
+.stat .k{display:block;font-size:10px;color:var(--muted);margin-bottom:1px}
+.stat .v{display:block;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
 .stat .v.warn{color:var(--danger)}
 .stat .v.good{color:var(--ok)}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-bottom:12px}
-.segmented{display:inline-flex;background:#efe9df;border-radius:999px;padding:4px;gap:3px}
+/* 工具栏固定两行网格，不再换行撑高页面 */
+.toolbar{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-items:stretch;margin-bottom:8px}
+.segmented{grid-column:span 2;display:flex;background:#efe9df;border-radius:999px;padding:3px;gap:2px;min-width:0}
 .segmented button{
-  border:0;background:transparent;color:var(--muted);font-size:13px;font-weight:600;
-  padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;white-space:nowrap;
-  min-height:38px;transition:background .15s,color .15s,box-shadow .15s
+  flex:1;min-width:0;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
+  padding:5px 2px;border-radius:999px;cursor:pointer;font-family:inherit;white-space:nowrap;
+  min-height:34px;transition:background .15s,color .15s,box-shadow .15s
 }
 .segmented button.active{background:var(--card);color:var(--accent);box-shadow:0 2px 6px rgba(90,70,50,.14)}
 .btn{
   border:1px solid var(--line);background:var(--card);color:var(--ink);
-  border-radius:11px;padding:9px 13px;font-size:13px;font-weight:600;cursor:pointer;
-  font-family:inherit;min-height:40px;white-space:nowrap;
+  border-radius:10px;padding:6px 3px;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:inherit;min-height:34px;white-space:nowrap;
   transition:transform .12s,box-shadow .12s,border-color .12s,background .12s
 }
 .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(90,70,50,.12);border-color:#d8c8b3}
@@ -78,24 +85,26 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.danger{color:var(--danger);border-color:#f0cdc9}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.modal-card .btn{padding:8px 12px;font-size:13px;min-height:38px}
 .feedback{
-  display:flex;align-items:flex-start;gap:9px;min-height:46px;
-  border-radius:13px;padding:11px 14px;margin-bottom:12px;
-  font-size:13px;line-height:1.6;font-weight:600;
+  flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:36px;
+  border-radius:11px;padding:7px 11px;margin-bottom:8px;
+  font-size:12px;line-height:1.45;font-weight:600;
   background:var(--card);border:1px solid var(--line);color:var(--muted);
   transition:background .18s,color .18s,border-color .18s
 }
-.feedback .ico{flex:0 0 auto;font-size:15px;line-height:1.4}
+.feedback .ico{flex:0 0 auto;font-size:14px;line-height:1.4}
 .feedback.warn{background:var(--danger-soft);border-color:#f3c5c0;color:#a4312b}
 .feedback.info{background:var(--info-soft);border-color:#cfdff2;color:#2b5687}
 .feedback.success{background:var(--ok-soft);border-color:#bfdfc9;color:#1f6b43}
-.board-shell{position:relative}
+/* 棋盘区吃掉一屏里剩下的高度，棋盘由 fitBoard() 按可用空间取正方形 */
+.board-shell{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center}
 .board{
-  display:grid;width:100%;aspect-ratio:1/1;gap:0;overflow:hidden;
-  border-radius:16px;background:#fff;--n:5;
+  display:grid;gap:0;overflow:hidden;flex:0 0 auto;
+  border-radius:16px;background:#fff;--n:5;--board-size:320px;
   box-shadow:0 12px 30px rgba(90,70,50,.16),0 2px 6px rgba(90,70,50,.08);
   user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
-  touch-action:manipulation
+  touch-action:none
 }
 .board.is-swiping{box-shadow:0 0 0 4px rgba(169,113,63,.45),0 12px 30px rgba(90,70,50,.18)}
 .cell{
@@ -117,12 +126,12 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   width:78%;height:78%;border-radius:50%;line-height:1;
   background:radial-gradient(circle at 34% 28%,#fffaf1,#eccfa8);
   box-shadow:0 2px 7px rgba(90,60,30,.3),inset 0 0 0 2px rgba(255,255,255,.75);
-  font-size:clamp(10px,calc(min(86vw,588px) / var(--n) * 0.5),30px);
+  font-size:clamp(10px,calc(var(--board-size) / var(--n) * 0.5),30px);
   animation:pop .28s cubic-bezier(.2,1.5,.4,1) both
 }
 .cross{
   color:#9c8e7e;font-weight:700;opacity:.8;
-  font-size:clamp(10px,calc(min(86vw,588px) / var(--n) * 0.46),27px);
+  font-size:clamp(10px,calc(var(--board-size) / var(--n) * 0.46),27px);
   animation:fade .18s ease-out both
 }
 @keyframes pop{from{transform:scale(.25);opacity:0}to{transform:scale(1);opacity:1}}
@@ -136,21 +145,29 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 }
 .loading .spin{font-size:34px;animation:rotate 1.4s linear infinite}
 @keyframes rotate{to{transform:rotate(360deg)}}
-.legend{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;margin:14px 0 4px;font-size:11.5px;color:var(--muted)}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
+.legend{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:3px 12px;justify-content:center;margin:7px 0 0;font-size:10.5px;color:var(--muted);line-height:1.5}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
 .legend i.bear-dot{background:#eccfa8;border-radius:50%}
-.legend i.cross-dot{background:#fff;color:#9c8e7e;font-style:normal;text-align:center;line-height:12px}
+.legend i.cross-dot{background:#fff;color:#9c8e7e;font-style:normal;text-align:center;line-height:11px}
 .legend i.conflict-dot{background:var(--danger-soft);border:2px solid var(--danger)}
 .legend .tip{width:100%;text-align:center;color:var(--accent);font-weight:600}
-details.rules{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:12.5px;color:var(--muted);line-height:1.9}
-details.rules summary{cursor:pointer;font-weight:700;color:var(--ink);font-size:14px}
-details.rules ol{margin:10px 0 2px;padding-left:20px}
-details.rules b{color:var(--accent)}
-.modal{position:fixed;inset:0;z-index:20;background:rgba(59,50,42,.46);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px)}
-.modal-card{background:var(--card);border-radius:22px;padding:26px 22px;text-align:center;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.22);animation:rise .32s cubic-bezier(.2,1.3,.4,1) both;max-height:86vh;overflow:auto}
+/* 玩法说明弹窗：主界面不再堆叠长篇文字 */
+.modal{position:fixed;inset:0;z-index:20;height:100vh;height:100dvh;background:rgba(59,50,42,.46);display:flex;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(3px);overscroll-behavior:contain}
+.modal-card{background:var(--card);border-radius:22px;padding:20px 18px;text-align:center;max-width:360px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.22);animation:rise .32s cubic-bezier(.2,1.3,.4,1);max-height:88vh;max-height:88dvh;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .modal-card.wide{max-width:460px}
-@keyframes rise{from{transform:translateY(18px) scale(.94);opacity:0}to{transform:none;opacity:1}}
+.help-body{text-align:left;margin:0 0 10px;font-size:12px;color:var(--muted);line-height:1.65}
+.help-body ol{margin:0;padding-left:19px}
+.help-body li{margin-bottom:5px}
+.help-body b{color:var(--accent)}
+.help-legend{display:flex;flex-wrap:wrap;gap:5px 12px;margin:8px 0 0;font-size:11px}
+.help-legend span{display:inline-flex;align-items:center;gap:5px}
+.help-legend i{width:13px;height:13px;border-radius:4px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
+.help-tip{margin:0 0 10px;padding:8px 10px;background:var(--info-soft);border:1px solid #cfdff2;border-radius:10px;font-size:11.5px;line-height:1.6;color:#2b5687;text-align:left}
+#helpModal .modal-emoji{font-size:32px}
+/* 关闭按钮吸附卡片底部，长说明滚动时也始终可点 */
+#helpModal .modal-foot{position:sticky;bottom:-2px;background:var(--card);padding-top:10px;z-index:1}
+@keyframes rise{from{transform:translateY(18px) scale(.94)}to{transform:none}}
 .modal-emoji{font-size:42px;line-height:1.2}
 .modal-card h2{margin:6px 0 8px;font-size:21px}
 .modal-card p{margin:0 0 18px;color:var(--muted);font-size:13.5px;line-height:1.8;white-space:pre-line}
@@ -178,18 +195,38 @@ details.rules b{color:var(--accent)}
 .sub-rec-list span b{color:var(--ink)}
 .note{font-size:11px;color:var(--muted);line-height:1.6;margin:10px 0 14px}
 .modal-foot{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.back-link{text-align:center;margin:18px 0 0;font-size:12.5px}
-.back-link a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
-.back-link a:hover{border-bottom-color:var(--accent)}
 @media (max-width:420px){
-  .app{padding:16px 10px 30px}
-  .stat .v{font-size:15px}
-  .btn{padding:8px 10px;font-size:12.5px}
-  .segmented button{padding:7px 11px;font-size:12.5px}
+  .app{padding-left:10px;padding-right:10px}
+  .sub{display:none}
+  .stat .v{font-size:14px}
+  .btn{padding:6px 2px;font-size:11.5px;min-height:32px}
+  .segmented button{padding:5px 1px;font-size:11.5px;min-height:32px}
   .level-grid{grid-template-columns:repeat(3,1fr)}
   .sub-progress{gap:3px}
-  .sub-dot{font-size:10px;height:20px;border-radius:6px}
+  .sub-dot{font-size:9px;height:17px;border-radius:5px}
+  .legend{font-size:10px}
+  .modal-card{padding:20px 16px}
 }
+/* 矮屏继续压缩非棋盘元素，保证棋盘始终完整可见 */
+@media (max-height:700px){
+  .sub{display:none}
+  header{margin-bottom:5px}
+  h1{font-size:22px}
+  .sub-progress{margin-top:5px}
+  .stats{margin:6px 0}
+  .toolbar{margin-bottom:6px}
+  .feedback{margin-bottom:6px;min-height:32px}
+  .legend{margin-top:5px}
+  .legend .tip{display:none}
+}
+@media (max-height:560px){
+  .legend{display:none}
+  .stat .k{display:none}
+  .sub-dot{height:14px}
+}
+.back-link{text-align:center;margin:6px 0 0;font-size:11px;flex:0 0 auto}
+.back-link a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
+.back-link a:hover{border-bottom-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -224,6 +261,7 @@ details.rules b{color:var(--accent)}
     <button type="button" class="btn" id="checkBtn">检查局面</button>
     <button type="button" class="btn" id="restartBtn">重新开始</button>
     <button type="button" class="btn" id="shuffleBtn">换一盘</button>
+    <button type="button" class="btn" id="helpBtn">玩法说明</button>
   </div>
 
   <div class="feedback" id="feedback" role="status" aria-live="polite">
@@ -237,25 +275,12 @@ details.rules b{color:var(--accent)}
   </div>
 
   <div class="legend">
-    <span><i class="bear-dot"></i>熊熊标记</span>
+    <span><i class="bear-dot"></i>熊熊</span>
     <span><i class="cross-dot">✕</i>排除笔记</span>
-    <span><i class="conflict-dot"></i>冲突位置</span>
+    <span><i class="conflict-dot"></i>冲突</span>
     <span><i style="background:hsl(280,56%,86%)"></i>彩色块 = 一个区域</span>
-    <span class="tip">手机操作：按住格子直接滑动即可连续打叉，从已有叉上起手则是连续擦除（不用等长按）</span>
+    <span class="tip">按住格子滑动即可连续打叉，详细玩法见「玩法说明」</span>
   </div>
-
-  <details class="rules">
-    <summary>玩法与闯关说明</summary>
-    <ol>
-      <li>棋盘被分成若干块<b>彩色区域</b>，每个区域、每一行、每一列都<b>有且仅有一只熊熊</b>。</li>
-      <li>点击放熊熊，再点一次取消；右键或切换「打叉」做排除笔记，笔记不参与判定。手机上<b>按住格子滑动</b>即可连续打叉或擦除，不必等长按；从已有叉上起手则是擦除。</li>
-      <li>同一行、列或色块出现两只熊熊时会标红并给出具体冲突提示，冲突涉及的色块也会整体描边。</li>
-      <li>每一大关含 <b>10 个小关</b>，<b>全部 10 个小关完成才解锁下一大关</b>；每过一大关棋盘增加一行一列。已解锁的大关可反复重玩。</li>
-      <li><b>每小关棋盘都随机生成，没有固定布局</b>：下一小关、重玩、点「换一盘」都会得到全新棋盘；只有中途退出后回来会恢复原来那盘。</li>
-      <li>每个小关与整个大关的<b>最佳用时、最少步数、通关次数</b>，以及未完成的局面都保存在本机浏览器；切到后台时计时自动暂停。</li>
-      <li>桌面快捷键：<b>Z</b> 撤销、<b>X</b> 切换标记模式、<b>Esc</b> 关闭弹窗。</li>
-    </ol>
-  </details>
   <p class="back-link"><a href="/projects.html">← 返回「我的项目」</a></p>
 </div>
 
@@ -287,6 +312,34 @@ details.rules b{color:var(--accent)}
       <button type="button" class="btn" id="closeLevels">返回棋盘</button>
       <button type="button" class="btn" id="resetLevelBtn">从头挑战本关</button>
       <button type="button" class="btn danger" id="clearBtn">清空本地成绩</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="modal-card wide">
+    <div class="modal-emoji">🐻</div>
+    <h2>玩法与闯关说明</h2>
+    <div class="help-tip"><b>手机操作：</b>按住格子直接滑动即可连续打叉（不用等长按），从已有叉上起手则是擦除，一次滑动记 1 步。棋盘已锁定为一屏，在上面滑动不会带动页面。</div>
+    <div class="help-body">
+      <ol>
+        <li>棋盘被分成若干块<b>彩色区域</b>，每个区域、每一行、每一列都<b>有且仅有一只熊熊</b>。</li>
+        <li>点击放熊熊，再点一次取消；右键或切换「打叉」做排除笔记，笔记不参与判定。三个条件同时满足即通关。</li>
+        <li>同一行、列或色块出现两只熊熊时会标红并给出具体冲突提示，冲突涉及的色块也会整体描边。</li>
+        <li>每一大关含 <b>10 个小关</b>，<b>全部完成才解锁下一大关</b>；每过一大关棋盘增加一行一列。已解锁的大关可反复重玩。</li>
+        <li><b>每小关棋盘都随机生成，没有固定布局</b>：下一小关、重玩、点「换一盘」都会得到全新棋盘；只有中途退出后回来会恢复原来那盘。</li>
+        <li>每个小关与整个大关的<b>最佳用时、最少步数、通关次数</b>，以及未完成的局面都保存在本机浏览器；切到后台时计时自动暂停。</li>
+        <li>桌面快捷键：<b>Z</b> 撤销、<b>X</b> 切换标记模式、<b>Esc</b> 关闭弹窗。</li>
+      </ol>
+      <div class="help-legend">
+        <span><i style="background:#eccfa8;border-radius:50%"></i>熊熊标记</span>
+        <span><i style="background:#fff;color:#9c8e7e;font-style:normal;text-align:center;line-height:12px">✕</i>排除笔记</span>
+        <span><i style="background:var(--danger-soft);border:2px solid var(--danger)"></i>冲突位置</span>
+        <span><i style="background:hsl(280,56%,86%)"></i>彩色块 = 一个区域</span>
+      </div>
+    </div>
+    <div class="modal-foot" style="margin-top:14px">
+      <button type="button" class="btn primary" id="closeHelp">开始找熊熊</button>
     </div>
   </div>
 </div>
@@ -593,6 +646,36 @@ var BearLogic = (function(){
     return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;
   }
   function vibrate(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}}
+  /* 一屏布局：棋盘按剩余空间取正方形，棋子字号随棋盘实际尺寸缩放 */
+  function fitBoard(){
+    var shell=boardEl.parentNode;
+    if(!shell)return;
+    var w=shell.clientWidth,h=shell.clientHeight;
+    if(w<40||h<40)return;
+    var px=Math.floor(Math.min(w,h))+'px';
+    if(boardEl.style.getPropertyValue('--board-size')===px)return;
+    boardEl.style.width=px;
+    boardEl.style.height=px;
+    boardEl.style.setProperty('--board-size',px);
+  }
+  function scheduleFit(){
+    fitBoard();
+    /* 下一帧再校准一次，覆盖布局尚未稳定的情况；不使用 rAF 作为唯一路径 */
+    if(window.requestAnimationFrame)requestAnimationFrame(fitBoard);
+  }
+  window.addEventListener('resize',scheduleFit);
+  window.addEventListener('orientationchange',function(){setTimeout(scheduleFit,150);});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',scheduleFit);
+  /* 旋转、地址栏收起、分屏等场景可能不派发 resize，用容器尺寸变化兜底 */
+  if(window.ResizeObserver){
+    try{new ResizeObserver(scheduleFit).observe(boardEl.parentNode);}catch(e){}
+  }
+  /* 主页面固定为一屏：除弹窗内容外，任何触摸拖动都不会带动页面 */
+  document.addEventListener('touchmove',function(e){
+    var t=e.target;
+    if(t&&t.closest&&t.closest('.modal-card'))return;
+    if(e.cancelable)e.preventDefault();
+  },{passive:false});
   function defaultSave(){return {v:3,unlocked:1,records:{},progress:{}};}
   function loadSave(){
     try{
@@ -833,7 +916,7 @@ var BearLogic = (function(){
       var more=ev.issues.length>3?'，另有 '+(ev.issues.length-3)+' 处冲突':'';
       setFeedback('warn','⚠️','冲突：'+parts.join('；')+more+'。取消一只即可继续。');
     }else if(ev.placed===0){
-      setFeedback('','🐾','点击放熊熊；右键或「打叉」做排除笔记，手机按住格子滑动即可连续打叉。');
+      setFeedback('','🐾','点击放熊熊 · 按住滑动连续打叉 · 玩法见「玩法说明」');
     }else{
       setFeedback('info','🐾','目前没有冲突，已放 '+ev.placed+' / '+n+' 只熊熊，还差 '+(n-ev.placed)+' 只。');
     }
@@ -1100,6 +1183,16 @@ var BearLogic = (function(){
     buildLevelPanel();
     el('levelModal').hidden=false;
     el('winModal').hidden=true;
+    el('helpModal').hidden=true;
+  }
+  function openHelp(){
+    el('levelModal').hidden=true;
+    el('winModal').hidden=true;
+    el('helpModal').hidden=false;
+  }
+  function closeHelp(){
+    el('helpModal').hidden=true;
+    if(G&&G.won)el('winModal').hidden=false;
   }
 
   function loadLevel(level,opts){
@@ -1127,9 +1220,9 @@ var BearLogic = (function(){
         won:false,subDone:false,flash:null,history:[],lastRender:null,nextAction:null
       };
       saveProgress();
-      buildBoardDom();renderSubProgress();updateLevelBar();
+      buildBoardDom();renderSubProgress();updateLevelBar();fitBoard();
       showLoading(false);
-      el('winModal').hidden=true;el('levelModal').hidden=true;
+      el('winModal').hidden=true;el('levelModal').hidden=true;el('helpModal').hidden=true;
       el('timeVal').textContent=fmtTime(G.elapsed);
       if(resumed)flash('info','📂','已恢复第 '+level+' 关 · 第 '+G.sub+' 小关上次的棋盘与进度。',3000);
       else flash('','🐻','第 '+level+' 关 · 第 '+G.sub+' / '+SUBS+' 小关 · '+n+' × '+n+'，全新随机棋盘。',3200);
@@ -1145,6 +1238,9 @@ var BearLogic = (function(){
   el('restartBtn').addEventListener('click',restart);
   el('shuffleBtn').addEventListener('click',shuffleBoard);
   el('levelBtn').addEventListener('click',openLevels);
+  el('helpBtn').addEventListener('click',openHelp);
+  el('closeHelp').addEventListener('click',closeHelp);
+  el('helpModal').addEventListener('click',function(e){if(e.target===el('helpModal'))closeHelp();});
   el('levelGrid').addEventListener('click',function(e){
     var b=e.target.closest('.level-card');
     if(b&&!b.disabled)loadLevel(Number(b.dataset.level));
@@ -1179,11 +1275,13 @@ var BearLogic = (function(){
   });
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'){
-      if(!el('levelModal').hidden){el('levelModal').hidden=true;if(G&&G.won)el('winModal').hidden=false;}
+      if(!el('helpModal').hidden)closeHelp();
+      else if(!el('levelModal').hidden){el('levelModal').hidden=true;if(G&&G.won)el('winModal').hidden=false;}
       else if(!el('winModal').hidden&&!(G&&G.won))el('winModal').hidden=true;
       return;
     }
     if(e.ctrlKey||e.metaKey||e.altKey)return;
+    if(!el('helpModal').hidden||!el('levelModal').hidden||!el('winModal').hidden)return;
     var k=e.key.toLowerCase();
     if(k==='z')undo();
     else if(k==='x'&&G)setMode(G.mode==='bear'?'cross':'bear');
@@ -1195,6 +1293,8 @@ var BearLogic = (function(){
   });
   window.addEventListener('pagehide',flushProgress);
   setInterval(function(){
+    /* 兜底校准：部分移动浏览器在地址栏收起/分屏时不派发 resize，也暂停 ResizeObserver */
+    fitBoard();
     if(!G||G.won||document.hidden||el('loading').hidden===false)return;
     G.elapsed=Math.floor((Date.now()-G.start)/1000);
     el('timeVal').textContent=fmtTime(G.elapsed);
