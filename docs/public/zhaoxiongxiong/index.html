@@ -65,9 +65,10 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 .stat .v{display:block;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
 .stat .v.warn{color:var(--danger)}
 .stat .v.good{color:var(--ok)}
-/* 工具栏固定两行网格，不再换行撑高页面 */
-.toolbar{flex:0 0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch;margin-bottom:8px}
-.segmented{grid-column:span 2;display:flex;background:#efe9df;border-radius:999px;padding:3px;gap:2px;min-width:0}
+/* 四个功能按钮固定一行；模式切换收窄后放到棋盘左上角，与反馈条并排 */
+.toolbar{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-items:stretch;margin-bottom:6px}
+.control-row{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.segmented{flex:0 0 auto;width:168px;max-width:52%;display:flex;background:#efe9df;border-radius:999px;padding:3px;gap:2px;min-width:0}
 .segmented button{
   flex:1;min-width:0;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
   padding:5px 2px;border-radius:999px;cursor:pointer;font-family:inherit;white-space:nowrap;
@@ -96,6 +97,8 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   transition:background .18s,color .18s,border-color .18s
 }
 .feedback .ico{flex:0 0 auto;font-size:14px;line-height:1.4}
+/* 与模式切换并排时吃掉剩余宽度，去掉自身下边距 */
+.control-row .feedback{flex:1 1 auto;min-width:0;margin-bottom:0}
 .feedback.warn{background:var(--danger-soft);border-color:#f3c5c0;color:#a4312b}
 .feedback.info{background:var(--info-soft);border-color:#cfdff2;color:#2b5687}
 .feedback.success{background:var(--ok-soft);border-color:#bfdfc9;color:#1f6b43}
@@ -217,6 +220,7 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   .sub-progress{margin-top:5px}
   .stats{margin:6px 0}
   .toolbar{margin-bottom:6px}
+  .control-row{margin-bottom:6px}
   .feedback{margin-bottom:6px;min-height:32px}
   .legend{margin-top:5px}
   .legend .tip{display:none}
@@ -254,19 +258,21 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   </div>
 
   <div class="toolbar">
-    <div class="segmented" id="modePicker" aria-label="选择短按的标记类型">
-      <button type="button" data-mode="bear">🐻 放熊熊</button>
-      <button type="button" data-mode="cross" class="active">✕ 打叉</button>
-    </div>
     <button type="button" class="btn" id="hintBtn">提示一只</button>
     <button type="button" class="btn" id="restartBtn">重新开始</button>
     <button type="button" class="btn" id="shuffleBtn">换一盘</button>
     <button type="button" class="btn" id="helpBtn">玩法说明</button>
   </div>
 
-  <div class="feedback" id="feedback" role="status" aria-live="polite">
-    <span class="ico" id="feedbackIcon">🐾</span>
-    <span id="feedbackText">正在准备棋盘…</span>
+  <div class="control-row">
+    <div class="segmented" id="modePicker" aria-label="选择短按的标记类型">
+      <button type="button" data-mode="bear">🐻 放熊熊</button>
+      <button type="button" data-mode="cross" class="active">✕ 打叉</button>
+    </div>
+    <div class="feedback" id="feedback" role="status" aria-live="polite">
+      <span class="ico" id="feedbackIcon">🐾</span>
+      <span id="feedbackText">正在准备棋盘…</span>
+    </div>
   </div>
 
   <div class="board-shell">
