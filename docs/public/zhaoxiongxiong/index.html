@@ -66,7 +66,7 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 .stat .v.warn{color:var(--danger)}
 .stat .v.good{color:var(--ok)}
 /* 工具栏固定两行网格，不再换行撑高页面 */
-.toolbar{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-items:stretch;margin-bottom:8px}
+.toolbar{flex:0 0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch;margin-bottom:8px}
 .segmented{grid-column:span 2;display:flex;background:#efe9df;border-radius:999px;padding:3px;gap:2px;min-width:0}
 .segmented button{
   flex:1;min-width:0;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;
@@ -85,6 +85,8 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.danger{color:var(--danger);border-color:#f0cdc9}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+/* 提示冷却中的倒计时仍要清晰可读 */
+#hintBtn:disabled{opacity:.85;color:var(--accent);border-color:#e0cdb6;font-variant-numeric:tabular-nums}
 .modal-card .btn{padding:8px 12px;font-size:13px;min-height:38px}
 .feedback{
   flex:0 0 auto;display:flex;align-items:center;gap:8px;min-height:36px;
@@ -252,13 +254,11 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   </div>
 
   <div class="toolbar">
-    <div class="segmented" id="modePicker" aria-label="选择标记类型">
-      <button type="button" data-mode="bear" class="active">🐻 放熊熊</button>
-      <button type="button" data-mode="cross">✕ 打叉</button>
+    <div class="segmented" id="modePicker" aria-label="选择短按的标记类型">
+      <button type="button" data-mode="bear">🐻 放熊熊</button>
+      <button type="button" data-mode="cross" class="active">✕ 打叉</button>
     </div>
-    <button type="button" class="btn" id="undoBtn">撤销</button>
     <button type="button" class="btn" id="hintBtn">提示一只</button>
-    <button type="button" class="btn" id="checkBtn">检查局面</button>
     <button type="button" class="btn" id="restartBtn">重新开始</button>
     <button type="button" class="btn" id="shuffleBtn">换一盘</button>
     <button type="button" class="btn" id="helpBtn">玩法说明</button>
@@ -279,7 +279,7 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
     <span><i class="cross-dot">✕</i>排除笔记</span>
     <span><i class="conflict-dot"></i>冲突</span>
     <span><i style="background:hsl(280,56%,86%)"></i>彩色块 = 一个区域</span>
-    <span class="tip">按住格子滑动即可连续打叉，详细玩法见「玩法说明」</span>
+    <span class="tip">短按打叉 · 长按放熊熊 · 按住滑动可连续打叉</span>
   </div>
   <p class="back-link"><a href="/projects.html">← 返回「我的项目」</a></p>
 </div>
@@ -320,16 +320,17 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   <div class="modal-card wide">
     <div class="modal-emoji">🐻</div>
     <h2>玩法与闯关说明</h2>
-    <div class="help-tip"><b>手机操作：</b>按住格子直接滑动即可连续打叉（不用等长按），从已有叉上起手则是擦除，一次滑动记 1 步。棋盘已锁定为一屏，在上面滑动不会带动页面。</div>
+    <div class="help-tip"><b>手机操作：</b>轻点 = <b>打叉</b>（再点一次取消）；按住不动约 0.3 秒 = <b>放熊熊</b>（再长按一次取消）；按住滑动 = <b>连续打叉</b>，从叉上起手则连续擦除，一次滑动记 1 步。熊熊是少数且只用单格，长按一步到位，不必切换模式。棋盘锁定为一屏，滑动不会带动页面。</div>
     <div class="help-body">
       <ol>
         <li>棋盘被分成若干块<b>彩色区域</b>，每个区域、每一行、每一列都<b>有且仅有一只熊熊</b>。</li>
-        <li>点击放熊熊，再点一次取消；右键或切换「打叉」做排除笔记，笔记不参与判定。三个条件同时满足即通关。</li>
+        <li><b>短按（左键单击）打叉</b>做排除笔记，再点一次取消；<b>原地长按或桌面右键</b>放熊熊，再操作一次取消。工具栏可切换短按的标记类型（默认打叉），笔记不参与判定，三个条件同时满足即通关。</li>
         <li>同一行、列或色块出现两只熊熊时会标红并给出具体冲突提示，冲突涉及的色块也会整体描边。</li>
         <li>每一大关含 <b>10 个小关</b>，<b>全部完成才解锁下一大关</b>；每过一大关棋盘增加一行一列。已解锁的大关可反复重玩。</li>
         <li><b>每小关棋盘都随机生成，没有固定布局</b>：下一小关、重玩、点「换一盘」都会得到全新棋盘；只有中途退出后回来会恢复原来那盘。</li>
         <li>每个小关与整个大关的<b>最佳用时、最少步数、通关次数</b>，以及未完成的局面都保存在本机浏览器；切到后台时计时自动暂停。</li>
-        <li>桌面快捷键：<b>Z</b> 撤销、<b>X</b> 切换标记模式、<b>Esc</b> 关闭弹窗。</li>
+        <li>「提示一只」每成功使用一次需要冷却 <b>60 秒</b>，按钮上会直接显示剩余秒数；换棋盘、重玩或进入下一小关都不会重置冷却。</li>
+        <li>桌面快捷键：<b>Z</b> 撤销、<b>X</b> 切换短按的标记类型、<b>Esc</b> 关闭弹窗；<b>右键</b>等同于长按放熊熊，鼠标按住拖动也能连续打叉。</li>
       </ol>
       <div class="help-legend">
         <span><i style="background:#eccfa8;border-radius:50%"></i>熊熊标记</span>
@@ -635,8 +636,9 @@ var BearLogic = (function(){
   function el(id){return document.getElementById(id);}
   var boardEl=el('board'),cellEls=[];
   var G=null,save=null,storageOK=true,progressTimer=null,suppressUntil=0;
-  var gesture={active:false,swiping:false,timer:null,startIdx:-1,x:0,y:0,state:2,visited:{},changed:0};
-  var SWIPE_HOLD=260,SWIPE_SLOP=16,SUPPRESS_MS=650;
+  var gesture={active:false,swiping:false,longPressed:false,timer:null,pointerId:null,startIdx:-1,x:0,y:0,state:2,visited:{},suppressIdx:-1,changed:0};
+  var LONG_PRESS_MS=320,SWIPE_SLOP=16,SUPPRESS_MS=650,HINT_COOLDOWN_MS=60000;
+  var hintReadyAt=0;
   var confirmClear=false,clearTimer=null;
 
   function sizeForLevel(level){return level+4;}
@@ -676,7 +678,7 @@ var BearLogic = (function(){
     if(t&&t.closest&&t.closest('.modal-card'))return;
     if(e.cancelable)e.preventDefault();
   },{passive:false});
-  function defaultSave(){return {v:3,unlocked:1,records:{},progress:{}};}
+  function defaultSave(){return {v:3,unlocked:1,records:{},progress:{},hintReadyAt:0};}
   function loadSave(){
     try{
       var raw=localStorage.getItem(SAVE_KEY);
@@ -687,7 +689,9 @@ var BearLogic = (function(){
         v:3,
         unlocked:Math.max(1,Math.min(999,Number(d.unlocked)||1)),
         records:(d.records&&typeof d.records==='object')?d.records:{},
-        progress:(d.progress&&typeof d.progress==='object')?d.progress:{}
+        progress:(d.progress&&typeof d.progress==='object')?d.progress:{},
+        /* 冷却最多只认 60 秒，避免系统时间回拨把提示按钮永久锁死 */
+        hintReadyAt:Math.min(Date.now()+HINT_COOLDOWN_MS,Math.max(0,Number(d.hintReadyAt)||0))
       };
     }catch(e){storageOK=false;return defaultSave();}
   }
@@ -916,7 +920,7 @@ var BearLogic = (function(){
       var more=ev.issues.length>3?'，另有 '+(ev.issues.length-3)+' 处冲突':'';
       setFeedback('warn','⚠️','冲突：'+parts.join('；')+more+'。取消一只即可继续。');
     }else if(ev.placed===0){
-      setFeedback('','🐾','点击放熊熊 · 按住滑动连续打叉 · 玩法见「玩法说明」');
+      setFeedback('','🐾','短按打叉 · 长按放熊熊 · 按住滑动连续打叉 · 玩法见「玩法说明」');
     }else{
       setFeedback('info','🐾','目前没有冲突，已放 '+ev.placed+' / '+n+' 只熊熊，还差 '+(n-ev.placed)+' 只。');
     }
@@ -1039,8 +1043,23 @@ var BearLogic = (function(){
     var buttons=el('modePicker').querySelectorAll('button');
     for(var i=0;i<buttons.length;i++)buttons[i].classList.toggle('active',buttons[i].dataset.mode===mode);
   }
+  function updateHintButton(){
+    var btn=el('hintBtn'),left=Math.max(0,hintReadyAt-Date.now());
+    var cooling=left>0,label=cooling?('提示 '+Math.ceil(left/1000)+'s'):'提示一只';
+    if(btn.disabled!==cooling)btn.disabled=cooling;
+    if(btn.textContent!==label)btn.textContent=label;
+  }
+  function startHintCooldown(){
+    hintReadyAt=Date.now()+HINT_COOLDOWN_MS;
+    if(save){save.hintReadyAt=hintReadyAt;persist();}
+    updateHintButton();
+  }
   function hint(){
     if(!G||G.won)return;
+    if(Date.now()<hintReadyAt){
+      flash('warn','⏳','提示冷却中，'+Math.ceil((hintReadyAt-Date.now())/1000)+' 秒后可再次使用。',1700);
+      return;
+    }
     var sol=BearLogic.findSolution(G.n,G.region,G.cells,G.perm);
     if(!sol){flash('warn','🤔','当前熊熊位置已无法完成，先取消冲突或位置不对的熊熊吧。');return;}
     var rows=[];
@@ -1054,28 +1073,28 @@ var BearLogic = (function(){
     var r=rows[Math.floor(Math.random()*rows.length)];
     G.cells[r*G.n+sol[r]]=1;G.steps++;
     saveProgress();
-    flash('success','💡','提示：第 '+(r+1)+' 行可以在这里放一只熊熊。');
+    startHintCooldown();
+    flash('success','💡','提示：第 '+(r+1)+' 行可以在这里放一只熊熊。60 秒后可再提示。');
   }
-  function check(){
-    if(!G||G.won)return;
-    var sol=BearLogic.findSolution(G.n,G.region,G.cells,G.perm);
-    if(sol)flash('info','✅','检查通过：当前局面仍有可行的完成方式，继续找！');
-    else flash('warn','⚠️','检查发现：按现在的熊熊位置已无法完成，试着取消几只重新摆。');
-  }
-
-  /* 触屏：按住格子直接滑动即连续打叉，原地长按同样进入涂抹；从叉上起手则连续擦除。
-     移动端长按常会补发合成 click / contextmenu，若不屏蔽会把刚打上的起手格叉 toggle 掉。
-     抑制只作用于本次涂抹经过的格子，手势后立刻点击别的格子仍然有效。 */
+  /* 触屏与鼠标统一手势：
+       短按（左键单击）= 按工具栏所选标记操作，默认打叉；
+       原地长按（按住不动）= 放 / 取消熊熊，熊熊是少数且只需单格；
+       按住滑动 = 连续打叉（从已有叉上起手则连续擦除），一次滑动记 1 步；
+       桌面右键 = 放 / 取消熊熊，等价于长按。
+     长按与涂抹结束后移动端常补发合成 click / contextmenu，若不按格子屏蔽，
+     刚放好的熊熊或刚打上的叉会被立刻 toggle 掉；抑制窗内点其它格子仍然有效。 */
   function ignoreGestureEvent(e){
     if(gesture.swiping)return true;
     if(Date.now()>=suppressUntil)return false;
     var cell=e&&e.target&&e.target.closest?e.target.closest('.cell'):null;
-    return !!cell&&gesture.visited[Number(cell.dataset.idx)]===1;
+    if(!cell)return false;
+    var idx=Number(cell.dataset.idx);
+    return gesture.visited[idx]===1||idx===gesture.suppressIdx;
   }
   function startSwipe(){
-    if(!gesture.active||!G||G.won||gesture.swiping)return;
+    if(!gesture.active||!G||G.won||gesture.swiping||gesture.longPressed)return;
     clearTimeout(gesture.timer);
-    gesture.swiping=true;gesture.visited={};gesture.changed=0;
+    gesture.swiping=true;gesture.visited={};gesture.changed=0;gesture.suppressIdx=-1;
     gesture.state=G.cells[gesture.startIdx]===2?0:2;
     pushHistory();
     applySwipeAt(gesture.startIdx);
@@ -1086,6 +1105,8 @@ var BearLogic = (function(){
   function applySwipeAt(idx){
     if(!G||idx<0||idx>=G.n*G.n||gesture.visited[idx])return;
     gesture.visited[idx]=1;
+    /* 已放熊熊的格子不参与涂抹，避免手指滑过把熊熊抹成叉 */
+    if(G.cells[idx]===1)return;
     if(G.cells[idx]===gesture.state)return;
     G.cells[idx]=gesture.state;gesture.changed++;
     saveProgress();
@@ -1096,40 +1117,62 @@ var BearLogic = (function(){
     var cell=node&&node.closest?node.closest('.cell'):null;
     if(cell&&boardEl.contains(cell))applySwipeAt(Number(cell.dataset.idx));
   }
-  function endGesture(){
+  function onLongPress(){
+    if(!gesture.active||!G||G.won||gesture.swiping||gesture.longPressed)return;
     clearTimeout(gesture.timer);
-    var was=gesture.swiping,changed=gesture.changed,state=gesture.state;
-    gesture.active=false;gesture.swiping=false;
+    gesture.longPressed=true;
+    gesture.suppressIdx=gesture.startIdx;
+    suppressUntil=Date.now()+SUPPRESS_MS;
+    var idx=gesture.startIdx;
+    handleCell(idx,1);
+    vibrate(18);
+    if(!G.won)flash('info',G.cells[idx]===1?'🐻':'↩️',
+      G.cells[idx]===1?'长按放好一只熊熊，再长按一次可取消。':'长按已取消这只熊熊。',1500);
+  }
+  function endGesture(e){
+    if(e&&gesture.pointerId!=null&&e.pointerId!==gesture.pointerId)return;
+    clearTimeout(gesture.timer);
+    var was=gesture.swiping,changed=gesture.changed,state=gesture.state,long=gesture.longPressed;
+    gesture.active=false;gesture.swiping=false;gesture.pointerId=null;
     boardEl.classList.remove('is-swiping');
+    if(long){
+      /* 长按可能持续很久，松手时重新起算抑制窗，挡住随后补发的合成事件 */
+      suppressUntil=Date.now()+SUPPRESS_MS;
+    }
     if(was&&G){
       suppressUntil=Date.now()+SUPPRESS_MS;
       G.steps++;saveProgress();vibrate(8);
       flash('info','✕','已连续'+(state===2?'打叉':'擦除')+' '+changed+' 格。',1700);
     }
   }
-  boardEl.addEventListener('touchstart',function(e){
-    if(!G||G.won||e.touches.length!==1)return;
-    var t=e.touches[0],cell=e.target.closest?e.target.closest('.cell'):null;
+  boardEl.addEventListener('pointerdown',function(e){
+    if(!G||G.won||gesture.active)return;
+    if(e.pointerType==='mouse'&&e.button!==0)return; /* 右键交给 contextmenu */
+    var cell=e.target.closest?e.target.closest('.cell'):null;
     if(!cell||!boardEl.contains(cell))return;
-    gesture.active=true;gesture.swiping=false;
-    gesture.startIdx=Number(cell.dataset.idx);
-    gesture.x=t.clientX;gesture.y=t.clientY;
     clearTimeout(gesture.timer);
-    gesture.timer=setTimeout(startSwipe,SWIPE_HOLD);
-  },{passive:true});
-  boardEl.addEventListener('touchmove',function(e){
-    if(!gesture.active)return;
-    var t=e.touches[0];if(!t)return;
+    gesture.active=true;gesture.swiping=false;gesture.longPressed=false;
+    gesture.pointerId=e.pointerId;
+    gesture.startIdx=Number(cell.dataset.idx);
+    gesture.x=e.clientX;gesture.y=e.clientY;
+    gesture.changed=0;
+    gesture.timer=setTimeout(onLongPress,LONG_PRESS_MS);
+  });
+  /* 手势期间监听 document，滑出棋盘也能连续打叉；不使用指针捕获，
+     否则合成 click 的 target 会变成棋盘本身，短按就落不到格子上了 */
+  document.addEventListener('pointermove',function(e){
+    if(!gesture.active||(gesture.pointerId!=null&&e.pointerId!==gesture.pointerId))return;
+    if(gesture.longPressed){if(e.cancelable)e.preventDefault();return;}
     if(!gesture.swiping){
-      /* 按下后直接滑动也立即进入涂抹，不必等满长按时长；微小抖动仍视为普通点击 */
-      if(Math.abs(t.clientX-gesture.x)<=SWIPE_SLOP&&Math.abs(t.clientY-gesture.y)<=SWIPE_SLOP)return;
+      /* 微小抖动仍视为短按；超过阈值立即进入涂抹，不必等长按时长 */
+      if(Math.abs(e.clientX-gesture.x)<=SWIPE_SLOP&&Math.abs(e.clientY-gesture.y)<=SWIPE_SLOP)return;
       startSwipe();
     }
-    e.preventDefault();
-    swipeAtPoint(t.clientX,t.clientY);
+    if(e.cancelable)e.preventDefault();
+    swipeAtPoint(e.clientX,e.clientY);
   },{passive:false});
-  boardEl.addEventListener('touchend',endGesture);
-  boardEl.addEventListener('touchcancel',endGesture);
+  document.addEventListener('pointerup',endGesture);
+  document.addEventListener('pointercancel',endGesture);
 
   boardEl.addEventListener('click',function(e){
     if(ignoreGestureEvent(e)){e.preventDefault();return;}
@@ -1141,8 +1184,9 @@ var BearLogic = (function(){
     var cell=e.target.closest('.cell');
     if(!cell||!G)return;
     e.preventDefault();
-    if(ignoreGestureEvent(e))return;
-    handleCell(Number(cell.dataset.idx),2);
+    /* 手指还按着时系统补发的长按菜单不参与操作 */
+    if(gesture.active||ignoreGestureEvent(e))return;
+    handleCell(Number(cell.dataset.idx),1);
   });
 
   function buildLevelPanel(){
@@ -1206,7 +1250,7 @@ var BearLogic = (function(){
       var pr=normalizeProgress(save.progress[level],n);
       var board=(pr&&pr.board)?pr.board:BearLogic.generate(n);
       var palette=buildPalette(n);
-      var mode=G?G.mode:'bear';
+      var mode=G?G.mode:'cross';
       var resumed=!!(pr&&pr.board&&pr.cells);
       G={
         level:level,sub:pr?pr.sub:1,n:n,
@@ -1232,9 +1276,7 @@ var BearLogic = (function(){
   el('modePicker').addEventListener('click',function(e){
     var b=e.target.closest('button');if(b)setMode(b.dataset.mode);
   });
-  el('undoBtn').addEventListener('click',undo);
   el('hintBtn').addEventListener('click',hint);
-  el('checkBtn').addEventListener('click',check);
   el('restartBtn').addEventListener('click',restart);
   el('shuffleBtn').addEventListener('click',shuffleBoard);
   el('levelBtn').addEventListener('click',openLevels);
@@ -1271,7 +1313,7 @@ var BearLogic = (function(){
     }
     clearTimeout(clearTimer);confirmClear=false;
     el('clearBtn').textContent='清空本地成绩';
-    save=defaultSave();persist();buildLevelPanel();loadLevel(1,{fresh:true});
+    save=defaultSave();hintReadyAt=0;persist();updateHintButton();buildLevelPanel();loadLevel(1,{fresh:true});
   });
   document.addEventListener('keydown',function(e){
     if(e.key==='Escape'){
@@ -1295,12 +1337,15 @@ var BearLogic = (function(){
   setInterval(function(){
     /* 兜底校准：部分移动浏览器在地址栏收起/分屏时不派发 resize，也暂停 ResizeObserver */
     fitBoard();
+    updateHintButton();
     if(!G||G.won||document.hidden||el('loading').hidden===false)return;
     G.elapsed=Math.floor((Date.now()-G.start)/1000);
     el('timeVal').textContent=fmtTime(G.elapsed);
   },250);
 
   save=loadSave();
+  hintReadyAt=save.hintReadyAt||0;
+  updateHintButton();
   /* 优先回到真正留有标记的局面，其次回到最近玩过的关卡，否则进入最新解锁的一关 */
   var startLevel=save.unlocked,maxProgress=0,maxActive=0;
   for(var key in save.progress){
