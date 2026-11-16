@@ -40,25 +40,26 @@ header{flex:0 0 auto;text-align:center;margin-bottom:8px}
 h1{margin:0;font-size:clamp(22px,5vw,30px);letter-spacing:2px;font-weight:800}
 h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 .sub{margin:4px 0 8px;color:var(--muted);font-size:11.5px;line-height:1.5}
+/* 关卡卡片：一行简洁标注 + 卡片内 10 小关进度条 */
 .level-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
   background:var(--card);border:1px solid var(--line);border-radius:12px;
-  padding:7px 10px;text-align:left
+  padding:8px 10px;text-align:left
 }
-.level-bar .lv-main{display:flex;flex-direction:column;gap:1px;min-width:0}
-.level-bar .lv-title{font-size:13.5px;font-weight:800;color:var(--accent)}
-.level-bar .lv-best{font-size:11px;color:var(--muted)}
-.level-bar .btn{flex:0 0 auto}
-.sub-progress{display:flex;gap:4px;margin:7px 0 0}
-.sub-dot{
-  flex:1;min-width:0;height:18px;border-radius:6px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;
-  border:1px solid var(--line);background:var(--card);color:var(--muted);
-  transition:background .2s,color .2s,border-color .2s,transform .2s
+.lv-head{display:flex;align-items:center;gap:8px}
+.level-bar .lv-title{font-size:14px;font-weight:800;color:var(--accent);white-space:nowrap}
+.level-bar .lv-size{
+  font-size:10.5px;color:var(--muted);white-space:nowrap;
+  padding:2px 7px;border:1px solid var(--line);border-radius:99px;background:#faf6ef
 }
-.sub-dot.done{background:var(--ok-soft);border-color:#bfdfc9;color:var(--ok)}
-.sub-dot.current{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(169,113,63,.3);transform:translateY(-1px)}
+.level-bar .lv-count{
+  margin-left:auto;font-size:12px;font-weight:700;color:var(--ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap
+}
+.level-bar .btn{flex:0 0 auto;padding:4px 9px;min-height:28px;font-size:11.5px}
+.lv-track{display:flex;gap:3px;height:6px;margin-top:7px}
+.lv-seg{flex:1;min-width:0;border-radius:99px;background:#ece5da;transition:background .25s}
+.lv-seg.done{background:var(--ok)}
+.lv-seg.current{background:rgba(169,113,63,.72)}
 .stats{flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:5px 4px;text-align:center}
 .stat .k{display:block;font-size:10px;color:var(--muted);margin-bottom:1px}
@@ -195,8 +196,7 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   .btn{padding:6px 2px;font-size:11.5px;min-height:32px}
   .segmented button{padding:5px 1px;font-size:11.5px;min-height:32px}
   .level-grid{grid-template-columns:repeat(3,1fr)}
-  .sub-progress{gap:3px}
-  .sub-dot{font-size:9px;height:17px;border-radius:5px}
+  .lv-track{gap:2px}
   .legend{font-size:10px}
   .modal-card{padding:20px 16px}
 }
@@ -205,7 +205,7 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
   .sub{display:none}
   header{margin-bottom:5px}
   h1{font-size:22px}
-  .sub-progress{margin-top:5px}
+  .lv-track{margin-top:5px}
   .stats{margin:6px 0}
   .toolbar{margin-bottom:6px}
   .control-row{margin-bottom:6px}
@@ -215,7 +215,7 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
 @media (max-height:560px){
   .legend{display:none}
   .stat .k{display:none}
-  .sub-dot{height:14px}
+  .lv-track{height:4px}
 }
 .back-link{text-align:center;margin:6px 0 0;font-size:11px;flex:0 0 auto}
 .back-link a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px}
@@ -228,13 +228,14 @@ h1 .logo{display:inline-block;transform:translateY(2px);margin-right:6px}
     <h1><span class="logo">🐻</span>找熊熊</h1>
     <p class="sub">每一行 · 每一列 · 每一个色块区域，都要有且仅有一只熊熊</p>
     <div class="level-bar">
-      <div class="lv-main">
-        <span class="lv-title" id="levelTitle">第 1 关 · 第 1 / 10 小关 · 5 × 5</span>
-        <span class="lv-best" id="levelBest">尚无成绩</span>
+      <div class="lv-head">
+        <span class="lv-title" id="levelTitle">第 1 关</span>
+        <span class="lv-size" id="levelSize">5 × 5</span>
+        <span class="lv-count" id="levelCount">0 / 10</span>
+        <button type="button" class="btn" id="levelBtn">选关</button>
       </div>
-      <button type="button" class="btn" id="levelBtn">关卡列表</button>
+      <div class="lv-track" id="subProgress" aria-label="本关 10 个小关进度"></div>
     </div>
-    <div class="sub-progress" id="subProgress" aria-label="本关 10 个小关进度"></div>
   </header>
 
   <div class="stats">
@@ -847,26 +848,23 @@ var BearLogic = (function(){
     G.lastRender=new Array(G.n*G.n).fill(null);
   }
 
+  /* 关卡卡片内的进度条：一段代表一小关，已完成绿色、当前段浅棕 */
   function renderSubProgress(){
     var html='';
     for(var k=1;k<=SUBS;k++){
       var done=k<G.sub||(G.subDone&&k===G.sub);
       var cls=done?'done':(k===G.sub?'current':'todo');
-      var label=done?'✓':String(k);
-      html+='<span class="sub-dot '+cls+'" title="第 '+k+' 小关'+(done?'（已完成）':(k===G.sub?'（当前）':'（未开始）'))+'">'+label+'</span>';
+      html+='<i class="lv-seg '+cls+'" title="第 '+k+' 小关'+(done?'（已完成）':(k===G.sub?'（进行中）':'（未开始）'))+'"></i>';
     }
     el('subProgress').innerHTML=html;
   }
 
+  /* 关卡栏只保留最必要的信息；最佳成绩放到「选关」弹窗里查看 */
   function updateLevelBar(){
-    var rec=save.records[G.level];
-    el('levelTitle').textContent='第 '+G.level+' 关 · 第 '+G.sub+' / '+SUBS+' 小关 · '+G.n+' × '+G.n;
-    if(rec&&rec.clears>0){
-      el('levelBest').textContent='大关最佳 '+fmtTime(rec.bestTime)+' · '+rec.bestSteps+' 步 · 已通关 '+rec.clears+' 次';
-    }else{
-      var done=(G.sub-1)+(G.subDone?1:0);
-      el('levelBest').textContent='本次进度 '+done+' / '+SUBS+' 小关 · 已解锁 '+save.unlocked+' 关';
-    }
+    el('levelTitle').textContent='第 '+G.level+' 关';
+    el('levelSize').textContent=G.n+' × '+G.n;
+    var done=(G.sub-1)+(G.subDone?1:0);
+    el('levelCount').textContent=done+' / '+SUBS;
   }
 
   function render(force){
